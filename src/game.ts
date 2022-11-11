@@ -1,5 +1,5 @@
 import "phaser";
-import Stage from "./Stage";
+import Stage from "./scenes/Stage";
 
 const config = {
   title: "Stone Age Runner",
@@ -11,6 +11,13 @@ const config = {
   height: 360,
   parent: "game-container",
   scene: [Stage],
+  physics: {
+    default: "arcade",
+    arcade: {
+      debug: true,
+      gravity: { y: 1000 },
+    },
+  },
 };
 
 const game = new Phaser.Game(config);

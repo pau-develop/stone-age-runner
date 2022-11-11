@@ -1,3 +1,5 @@
+import Hero from "../classes/Hero";
+
 class Stage extends Phaser.Scene {
   hero;
   constructor() {
@@ -10,20 +12,15 @@ class Stage extends Phaser.Scene {
     });
   }
   create() {
-    this.anims.create({
-      key: "run",
-      frames: this.anims.generateFrameNumbers("hero", {
-        start: 0,
-        end: 11,
-      }),
-      frameRate: 25,
-      repeat: -1,
-    });
-    this.hero = this.add.sprite(64, 160, "hero");
-    this.hero.setOrigin(0, 0);
+    this.hero = new Hero(this, 64, 232, "hero");
     this.hero.play("run");
   }
-  update() {}
+
+  update() {
+    if (this.hero.isAlive) {
+      this.hero.moveHero();
+    }
+  }
 }
 
 export default Stage;
