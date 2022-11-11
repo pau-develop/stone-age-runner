@@ -1,21 +1,16 @@
 import "phaser";
-
-export default class Demo extends Phaser.Scene {
-  constructor() {
-    super("demo");
-  }
-
-  preload() {}
-
-  create() {}
-}
+import Stage from "./Stage";
 
 const config = {
+  title: "Stone Age Runner",
+  version: "0.0.1",
+  pixelArt: true,
   type: Phaser.AUTO,
-  backgroundColor: "#125555",
+  backgroundColor: "#000",
   width: 640,
   height: 360,
-  scene: Demo,
+  parent: "game-container",
+  scene: [Stage],
 };
 
 const game = new Phaser.Game(config);
