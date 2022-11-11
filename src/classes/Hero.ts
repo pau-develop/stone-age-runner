@@ -30,6 +30,16 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
 
   checkForCollision() {
     if (this.body.blocked.right) this.isAlive = false;
+    if (this.body.blocked.down) {
+      this.isJumping = false;
+      this.doubleJumped = false;
+      this.jumpForce = -200;
+      this.body.setSize(32, 54);
+      this.body.offset.y = 10;
+    } else {
+      this.body.setSize(32, 54);
+      this.body.offset.y = 5;
+    }
   }
 
   createAnimations() {
