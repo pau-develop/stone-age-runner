@@ -13,10 +13,11 @@ class Stage extends Phaser.Scene {
   }
   create() {
     this.hero = new Hero(this, 64, 232, "hero");
-    this.hero.play("run");
   }
 
   update() {
+    this.hero.checkForCollision();
+    this.hero.playAnimations();
     if (this.hero.isAlive) {
       this.hero.moveHero();
     }

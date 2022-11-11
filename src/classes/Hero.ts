@@ -1,5 +1,6 @@
 class Hero extends Phaser.Physics.Arcade.Sprite {
-  isAlive = false;
+  isAlive = true;
+  doubleJumped = false;
   constructor(scene, x, y, sprite) {
     super(scene, x, y, sprite);
     this.scene = scene;
@@ -8,6 +9,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     this.setOrigin(0, 0);
     this.init();
     this.createAnimations();
+    this.play("run");
   }
 
   init() {
@@ -18,6 +20,10 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
 
   moveHero() {
     this.body.velocity.x = 200;
+  }
+
+  checkForCollision() {
+    if (this.body.blocked.right) this.isAlive = false;
   }
 
   createAnimations() {
@@ -111,6 +117,67 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
       frameRate: 25,
       repeat: 0,
     });
+  }
+
+  playAnimations() {
+    if (this.isAlive) {
+      if (
+        !this.body.blocked.down &&
+        this.body.velocity.y <= 0 &&
+        this.anims.currentAnim.key !== "jump" &&
+        !this.doubleJumped
+      )
+        this.play("jump");
+      else if (
+        !this.body.blocked.down &&
+        this.body.velocity.y <= 0 &&
+        this.anims.currentAnim.key !== "double-jump" &&
+        this.doubleJumped
+      )
+        this.play("double-jump");
+      else if (
+        !this.body.blocked.down &&
+        this.body.velocity.y > 0 &&
+        this.anims.currentAnim.key !== "fall" &&
+        !this.doubleJumped
+      )
+        this.play("fall");
+      else if (
+        !this.body.blocked.down &&
+        this.body.velocity.y > 0 &&
+        this.anims.currentAnim.key !== "double-jump-fall" &&
+        this.doubleJumped
+      )
+        this.play("double-jump-fall");
+      else if (
+        this.body.blocked.down &&
+        this.anims.currentAnim.key !== "run" &&
+        this.anims.currentAnim.key !== "land"
+      )
+        this.play("land");
+      else if (
+        this.body.blocked.down &&
+        this.anims.currentAnim.key === "land" &&
+        this.anims.currentFrame.index === 4
+      ) {
+        this.play("run");
+      }
+    } else {
+      if (this.body.blocked.right && this.anims.currentAnim.key !== "crash") {
+        this.play("crash");
+      } else if (
+        this.anims.currentAnim.key === "crash" &&
+        this.anims.currentFrame.index === 10 &&
+        !this.body.blocked.down
+      )
+        this.play("crash-air");
+      else if (
+        this.anims.currentAnim.key === "crash" &&
+        this.anims.currentFrame.index === 10 &&
+        this.body.blocked.down
+      )
+        this.play("crash-land");
+    }
   }
 }
 
