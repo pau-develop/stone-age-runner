@@ -1,4 +1,5 @@
 import "phaser";
+import Stage from "./Stage";
 
 const config = {
   title: "Stone Age Runner",
@@ -9,6 +10,7 @@ const config = {
   width: 640,
   height: 360,
   parent: "game-container",
+  scene: [Stage],
 };
 
 const game = new Phaser.Game(config);
