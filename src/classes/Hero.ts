@@ -4,6 +4,9 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   doubleJumped = false;
   jumpLimit: number;
   jumpForce = -200;
+  justCrashed = false;
+  bounceSpeed = -50;
+
   constructor(scene, x, y, sprite) {
     super(scene, x, y, sprite);
     this.scene = scene;
@@ -27,7 +30,6 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
 
   checkForCollision() {
     if (this.body.blocked.right) this.isAlive = false;
-    console.log(this.isAlive);
   }
 
   createAnimations() {

@@ -25,6 +25,14 @@ class Stage extends Phaser.Scene {
     if (this.hero.isAlive) {
       this.hero.moveHero();
       this.getInput();
+    } else if (!this.hero.isAlive) {
+      if (!this.hero.justCrashed) {
+        this.hero.body.velocity.y = 0;
+        this.hero.justCrashed = true;
+      }
+      if (this.hero.bounceSpeed < 0) this.hero.bounceSpeed += 1;
+      else this.hero.bounceSpeed = 0;
+      this.hero.body.velocity.x = this.hero.bounceSpeed;
     }
   }
 
