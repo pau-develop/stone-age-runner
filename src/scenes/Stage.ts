@@ -1,16 +1,21 @@
 import Hero from "../classes/Hero";
 import Map from "../classes/Map";
+import Ui from "../classes/Ui";
 
 class Stage extends Phaser.Scene {
   hero;
   jump;
   map;
   background;
+  ui;
+  fps;
+  hasRestarted = false;
 
   constructor() {
     super("Stage");
   }
   preload() {
+    this.load.bitmapFont("04b", "assets/font/04b.png", "assets/font/04b.xml");
     this.load.spritesheet("hero", "assets/hero/hero.png", {
       frameWidth: 64,
       frameHeight: 64,
@@ -23,6 +28,7 @@ class Stage extends Phaser.Scene {
     this.load.image("background", "assets/background/0.png");
   }
   create() {
+    this.ui = new Ui(this, this.game);
     this.hero = new Hero(this, 64, 100, "hero");
     this.jump = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE
@@ -38,14 +44,16 @@ class Stage extends Phaser.Scene {
   }
 
   update() {
+    this.ui.getFPS(this.game);
     this.hero.checkForCollision();
     this.hero.playAnimations();
+    this.getInput();
     if (this.hero.isAlive) {
       this.map.shiftMaps(this.hero, this);
       this.hero.moveHero();
-      this.getInput();
     } else if (!this.hero.isAlive) {
       if (!this.hero.justCrashed) {
+        this.ui.displayDeathMessage(this);
         this.hero.body.velocity.y = 0;
         this.hero.justCrashed = true;
       }
@@ -56,35 +64,46 @@ class Stage extends Phaser.Scene {
   }
 
   getInput() {
-    //TAP
-    this.jump.on("down", () => {
-      if (this.hero.body.blocked.down && this.hero.isAlive) {
-        this.hero.jumpLimit = this.hero.y - 100;
-        this.hero.body.velocity.y = this.hero.jumpForce;
-        this.hero.isJumping = true;
-        return;
+    if (this.hero.isAlive) {
+      //TAP
+      this.jump.on("down", () => {
+        if (this.hero.body.blocked.down && this.hero.isAlive) {
+          this.hero.jumpLimit = this.hero.y - 100;
+          this.hero.body.velocity.y = this.hero.jumpForce;
+          this.hero.isJumping = true;
+          return;
+        }
+        if (!this.hero.body.blocked.down && !this.hero.doubleJumped) {
+          this.hero.doubleJumped = true;
+          this.hero.jumpLimit = this.hero.y - 100;
+          this.hero.jumpForce = -200;
+          this.hero.body.velocity.y = this.hero.jumpForce;
+          this.hero.isJumping = true;
+        }
+      });
+      //HOLD
+      if (this.jump.isDown && this.hero.isJumping) {
+        if (this.hero.y > this.hero.jumpLimit) {
+          this.hero.body.velocity.y = this.hero.jumpForce;
+          this.hero.jumpForce += 2;
+        } else {
+          this.hero.isJumping = false;
+        }
       }
-      if (!this.hero.body.blocked.down && !this.hero.doubleJumped) {
-        this.hero.doubleJumped = true;
-        this.hero.jumpLimit = this.hero.y - 100;
-        this.hero.jumpForce = -200;
-        this.hero.body.velocity.y = this.hero.jumpForce;
-        this.hero.isJumping = true;
-      }
-    });
-    //HOLD
-    if (this.jump.isDown && this.hero.isJumping) {
-      if (this.hero.y > this.hero.jumpLimit) {
-        this.hero.body.velocity.y = this.hero.jumpForce;
-        this.hero.jumpForce += 2;
-      } else {
+      //RELEASE
+      this.jump.on("up", () => {
         this.hero.isJumping = false;
+      });
+    } else {
+      if (this.ui.die !== undefined) {
+        this.jump.on("up", () => {
+          if (!this.hasRestarted) {
+            this.scene.restart();
+            this.hasRestarted = true;
+          }
+        });
       }
     }
-    //RELEASE
-    this.jump.on("up", () => {
-      this.hero.isJumping = false;
-    });
   }
 }
 
