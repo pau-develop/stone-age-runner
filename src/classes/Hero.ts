@@ -6,6 +6,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   jumpForce = -200;
   justCrashed = false;
   bounceSpeed = -50;
+  heroSpeed = 250;
 
   constructor(scene, x, y, sprite) {
     super(scene, x, y, sprite);
@@ -21,11 +22,12 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   init() {
     this.body.setSize(32, 54);
     this.body.offset.y = 10;
-    this.setCollideWorldBounds(true);
   }
 
   moveHero() {
-    this.body.velocity.x = 200;
+    this.body.velocity.x = this.heroSpeed;
+    //round the x pos so sprite won't jitter around
+    this.body.x = Math.round(this.body.x);
   }
 
   checkForCollision() {

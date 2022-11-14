@@ -1,8 +1,12 @@
 import Hero from "../classes/Hero";
+import Map from "../classes/Map";
 
 class Stage extends Phaser.Scene {
   hero;
   jump;
+  map;
+  background;
+
   constructor() {
     super("Stage");
   }
@@ -11,18 +15,33 @@ class Stage extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64,
     });
+    this.load.image("tiles", "assets/tiles/tiles.png");
+    this.map = new Map();
+    this.map.maps.forEach((element, index) => {
+      this.load.tilemapTiledJSON(`tilemap${index}`, element);
+    });
+    this.load.image("background", "assets/background/0.png");
   }
   create() {
-    this.hero = new Hero(this, 64, 232, "hero");
+    this.hero = new Hero(this, 64, 100, "hero");
     this.jump = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE
     );
+    this.map.instantiateMap(this.hero, this);
+
+    this.background = this.add.image(0, 0, "background");
+    this.background.setOrigin(0, 0);
+    this.background.setDepth(-50);
+    this.background.setScrollFactor(0, 0);
+    this.cameras.main.startFollow(this.hero, true, 1, 1, -192, 0);
+    this.cameras.main.setBounds(0, 0, NaN, 360);
   }
 
   update() {
     this.hero.checkForCollision();
     this.hero.playAnimations();
     if (this.hero.isAlive) {
+      this.map.shiftMaps(this.hero, this);
       this.hero.moveHero();
       this.getInput();
     } else if (!this.hero.isAlive) {
