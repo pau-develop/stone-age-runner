@@ -7,6 +7,9 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   justCrashed = false;
   bounceSpeed = -50;
   heroSpeed = 250;
+  heroEnergy = 0;
+  isRecovering = false;
+  isConsuming = false;
 
   constructor(scene, x, y, sprite) {
     super(scene, x, y, sprite);
@@ -20,6 +23,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   }
 
   init() {
+    this.isAlive = true;
     this.body.setSize(32, 54);
     this.body.offset.y = 10;
   }
@@ -38,9 +42,34 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
       this.jumpForce = -200;
       this.body.setSize(32, 54);
       this.body.offset.y = 10;
+      if (this.isAlive) this.fillEnergyBar();
     } else {
       this.body.setSize(32, 54);
       this.body.offset.y = 5;
+    }
+  }
+
+  fillEnergyBar() {
+    if (!this.isRecovering) {
+      this.isRecovering = true;
+      const interval = setInterval(() => {
+        if (this.heroEnergy < 100) this.heroEnergy += 1;
+        else this.heroEnergy = 100;
+        this.isRecovering = false;
+        clearInterval(interval);
+      }, 250);
+    }
+  }
+
+  consumeEnergyBar() {
+    if (!this.isConsuming) {
+      this.isConsuming = true;
+      const interval = setInterval(() => {
+        if (this.heroEnergy > 0) this.heroEnergy -= 1;
+        else this.heroEnergy = 0;
+        this.isConsuming = false;
+        clearInterval(interval);
+      }, 15);
     }
   }
 

@@ -9,12 +9,14 @@ class Stage extends Phaser.Scene {
   background;
   ui;
   fps;
-  hasRestarted = false;
+  hasRestarted: boolean;
 
   constructor() {
     super("Stage");
   }
   preload() {
+    this.load.image("bar-container", "assets/ui/bar-container.png");
+    this.load.image("bar", "assets/ui/bar.png");
     this.load.bitmapFont("04b", "assets/font/04b.png", "assets/font/04b.xml");
     this.load.spritesheet("hero", "assets/hero/hero.png", {
       frameWidth: 64,
@@ -26,6 +28,9 @@ class Stage extends Phaser.Scene {
       this.load.tilemapTiledJSON(`tilemap${index}`, element);
     });
     this.load.image("background", "assets/background/0.png");
+  }
+  init() {
+    this.hasRestarted = false;
   }
   create() {
     this.ui = new Ui(this, this.game);
@@ -45,6 +50,7 @@ class Stage extends Phaser.Scene {
 
   update() {
     this.ui.getFPS(this.game);
+    this.ui.controlBar(this.hero.heroEnergy);
     this.hero.checkForCollision();
     this.hero.playAnimations();
     this.getInput();
@@ -86,6 +92,10 @@ class Stage extends Phaser.Scene {
         if (this.hero.y > this.hero.jumpLimit) {
           this.hero.body.velocity.y = this.hero.jumpForce;
           this.hero.jumpForce += 2;
+          if (this.hero.doubleJumped && this.hero.heroEnergy > 0)
+            this.hero.consumeEnergyBar();
+          else if (this.hero.doubleJumped && this.hero.heroEnergy <= 0)
+            this.hero.isJumping = false;
         } else {
           this.hero.isJumping = false;
         }
@@ -95,14 +105,16 @@ class Stage extends Phaser.Scene {
         this.hero.isJumping = false;
       });
     } else {
-      if (this.ui.die !== undefined) {
-        this.jump.on("up", () => {
-          if (!this.hasRestarted) {
-            this.scene.restart();
-            this.hasRestarted = true;
-          }
-        });
-      }
+      this.jump.on("up", () => {
+        if (
+          !this.hasRestarted &&
+          !this.hero.isAlive &&
+          this.ui.die !== undefined
+        ) {
+          this.scene.restart();
+          this.hasRestarted = true;
+        }
+      });
     }
   }
 }
