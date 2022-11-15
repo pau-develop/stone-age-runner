@@ -10,6 +10,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   heroEnergy = 0;
   isRecovering = false;
   isConsuming = false;
+  score = 0;
 
   constructor(scene, x, y, sprite) {
     super(scene, x, y, sprite);
@@ -47,6 +48,10 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
       this.body.setSize(32, 54);
       this.body.offset.y = 5;
     }
+  }
+
+  update() {
+    console.log("hi");
   }
 
   fillEnergyBar() {
