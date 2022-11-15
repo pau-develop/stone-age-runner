@@ -64,12 +64,12 @@ class Stage extends Phaser.Scene {
   }
 
   update() {
+    this.ui.displayScore(this.hero.score);
     this.ui.getFPS(this.game);
     this.ui.controlBar(this.hero.heroEnergy);
     this.hero.checkForCollision();
     this.hero.playAnimations();
     this.getInput();
-    console.log(this.hero.score);
     if (this.hero.isAlive) {
       this.map.shiftMaps(this.hero, this);
       this.hero.moveHero();

@@ -13,7 +13,8 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
       this.fruit.destroy();
     });
     this.setFruitProperties(currentFruit);
-    console.log(this.points);
+    this.fruit.body.setMass(0);
+    this.fruit.body.mass;
   }
 
   setFruitProperties(currentFruit) {

@@ -50,10 +50,6 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  update() {
-    console.log("hi");
-  }
-
   fillEnergyBar() {
     if (!this.isRecovering) {
       this.isRecovering = true;
