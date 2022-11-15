@@ -1,3 +1,4 @@
+import Fruit from "../classes/Fruit";
 import Hero from "../classes/Hero";
 import Map from "../classes/Map";
 import Ui from "../classes/Ui";
@@ -10,11 +11,16 @@ class Stage extends Phaser.Scene {
   ui;
   fps;
   hasRestarted: boolean;
+  fruits;
 
   constructor() {
     super("Stage");
   }
   preload() {
+    this.load.spritesheet("fruits", "assets/collectibles/fruits.png", {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
     this.load.image("bar-container", "assets/ui/bar-container.png");
     this.load.image("bar", "assets/ui/bar.png");
     this.load.bitmapFont("04b", "assets/font/04b.png", "assets/font/04b.xml");
@@ -35,6 +41,15 @@ class Stage extends Phaser.Scene {
   create() {
     this.ui = new Ui(this, this.game);
     this.hero = new Hero(this, 64, 100, "hero");
+    const fruit = new Fruit(
+      this,
+      640,
+      200,
+      "fruits",
+      Math.round(Math.random() * 4),
+      this.hero
+    );
+
     this.jump = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE
     );
@@ -49,6 +64,7 @@ class Stage extends Phaser.Scene {
   }
 
   update() {
+    this.ui.displayScore(this.hero.score);
     this.ui.getFPS(this.game);
     this.ui.controlBar(this.hero.heroEnergy);
     this.hero.checkForCollision();
