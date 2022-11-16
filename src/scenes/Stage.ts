@@ -41,14 +41,6 @@ class Stage extends Phaser.Scene {
   create() {
     this.ui = new Ui(this, this.game);
     this.hero = new Hero(this, 64, 100, "hero");
-    const fruit = new Fruit(
-      this,
-      640,
-      200,
-      "fruits",
-      Math.round(Math.random() * 4),
-      this.hero
-    );
 
     this.jump = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE

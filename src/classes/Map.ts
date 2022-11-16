@@ -39,14 +39,12 @@ class Map {
       this.scrollingMap[2].x = this.scrollingMap[1].x + 640;
       map.setCollision([1, 2, 3, 4, 5, 6, 7, 8, 9]);
       scene.physics.add.collider(hero, this.scrollingMap[2]);
-      if (randomMap === 0) console.log("0!", this.scrollingMap[2].x);
       this.addCollectibles(hero, scene, randomMap, this.scrollingMap[2]);
     }
   }
 
   addCollectibles(hero, scene, mapNumber, mapPosition) {
-    console.log(mapNumber, fruitPositions.length);
-    if (mapNumber <= fruitPositions.length - 1)
+    if (mapNumber <= fruitPositions.length - 1) {
       this.spawnFruits(
         hero,
         scene,
@@ -55,18 +53,19 @@ class Map {
         mapPosition,
         fruitPositions[mapNumber].type
       );
+    }
   }
 
   spawnFruits(hero, scene, xPos, yPos, mapPosition, fruitGroup) {
     for (let i = 0; i < fruitGroup.length; i++) {
-      console.log(mapPosition.x + xPos, mapPosition.y + yPos);
       new Fruit(
         scene,
         mapPosition.x + xPos + fruitGroup[i].x,
         mapPosition.y + yPos + fruitGroup[i].y,
         "fruits",
         Math.round(Math.random() * 4),
-        hero
+        hero,
+        i % 2 === 0 ? 1 : -1
       );
     }
   }

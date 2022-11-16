@@ -2,9 +2,13 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
   fruit;
   points;
   energy;
-  constructor(scene, x, y, sprite, currentFruit, hero) {
+  yInitialPos;
+  direction;
+  topOffset;
+  botOffset;
+  oscillationSpeed = 20;
+  constructor(scene, x, y, sprite, currentFruit, hero, direction) {
     super(scene, x, y, sprite);
-
     this.fruit = scene.add.existing(this).setFrame(currentFruit);
     this.setOrigin(0, 0);
     this.scene.physics.world.enable(this);
@@ -17,6 +21,19 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
     this.setFruitProperties(currentFruit);
     this.fruit.body.setMass(0.5);
     this.fruit.body.mass;
+    this.yInitialPos = y;
+    this.direction = direction;
+    this.topOffset = this.yInitialPos + 5;
+    this.botOffset = this.yInitialPos - 5;
+    // console.log(
+    //   direction,
+    //   "Pos",
+    //   this.body.y,
+    //   "TOP",
+    //   this.topOffset,
+    //   "BOT",
+    //   this.botOffset
+    // );
   }
 
   setFruitProperties(currentFruit) {
@@ -50,6 +67,33 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
       default:
         null;
     }
+  }
+
+  preUpdate() {
+    this.fruitOscillation();
+    this.snap();
+  }
+
+  fruitOscillation() {
+    if (this.direction === 1) {
+      if (this.body.y < this.topOffset) {
+        this.body.velocity.y = this.oscillationSpeed * this.direction;
+      } else {
+        this.body.velocity.y = 0;
+        this.direction *= -1;
+      }
+    } else {
+      if (this.body.y > this.botOffset) {
+        this.body.velocity.y = this.oscillationSpeed * this.direction;
+      } else {
+        this.body.velocity.y = 0;
+        this.direction *= -1;
+      }
+    }
+  }
+
+  snap() {
+    this.body.y = Math.round(this.body.y);
   }
 }
 
