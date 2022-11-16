@@ -1,6 +1,7 @@
 import Fruit from "../classes/Fruit";
 import Hero from "../classes/Hero";
 import Map from "../classes/Map";
+import Steam from "../classes/Steam";
 import Ui from "../classes/Ui";
 
 class Stage extends Phaser.Scene {
@@ -21,9 +22,13 @@ class Stage extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 32,
     });
+    this.load.spritesheet("steam", "assets/hero/steam.png", {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
     this.load.image("bar-container", "assets/ui/bar-container.png");
     this.load.image("bar", "assets/ui/bar.png");
-    this.load.bitmapFont("04b", "assets/font/04b.png", "assets/font/04b.xml");
+    this.load.bitmapFont("2p", "assets/font/2p.png", "assets/font/2p.xml");
     this.load.spritesheet("hero", "assets/hero/hero.png", {
       frameWidth: 64,
       frameHeight: 64,
@@ -101,9 +106,10 @@ class Stage extends Phaser.Scene {
         if (this.hero.y > this.hero.jumpLimit) {
           this.hero.body.velocity.y = this.hero.jumpForce;
           this.hero.jumpForce += 2;
-          if (this.hero.doubleJumped && this.hero.heroEnergy > 0)
+          if (this.hero.doubleJumped && this.hero.heroEnergy > 0) {
             this.hero.consumeEnergyBar();
-          else if (this.hero.doubleJumped && this.hero.heroEnergy <= 0)
+            this.hero.emitSteam();
+          } else if (this.hero.doubleJumped && this.hero.heroEnergy <= 0)
             this.hero.isJumping = false;
         } else {
           this.hero.isJumping = false;

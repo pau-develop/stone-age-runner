@@ -13,8 +13,9 @@
 }
 
 #game-container {
-  height: 90%;
+  height: 80%;
   aspect-ratio: 16/9;
+
   margin: auto auto;
 }
 

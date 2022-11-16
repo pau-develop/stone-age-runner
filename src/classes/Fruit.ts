@@ -1,3 +1,5 @@
+import FloatingText from "./FloatingText";
+
 class Fruit extends Phaser.Physics.Arcade.Sprite {
   fruit;
   points;
@@ -14,6 +16,12 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
     this.scene.physics.world.enable(this);
     this.fruit.body.setAllowGravity(false);
     scene.physics.add.collider(this.fruit, hero, () => {
+      new FloatingText(
+        scene,
+        this.points,
+        this.fruit.body.x,
+        this.fruit.body.y
+      );
       this.fruit.destroy();
       hero.score += this.points;
       hero.heroEnergy += this.energy;
@@ -25,15 +33,6 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
     this.direction = direction;
     this.topOffset = this.yInitialPos + 5;
     this.botOffset = this.yInitialPos - 5;
-    // console.log(
-    //   direction,
-    //   "Pos",
-    //   this.body.y,
-    //   "TOP",
-    //   this.topOffset,
-    //   "BOT",
-    //   this.botOffset
-    // );
   }
 
   setFruitProperties(currentFruit) {
