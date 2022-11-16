@@ -35,6 +35,10 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     this.body.x = Math.round(this.body.x);
   }
 
+  checkEnergyStatus() {
+    if (this.heroEnergy > 100) this.heroEnergy = 100;
+  }
+
   checkForCollision() {
     if (this.body.blocked.right) this.isAlive = false;
     if (this.body.blocked.down) {

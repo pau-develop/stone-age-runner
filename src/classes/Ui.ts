@@ -39,6 +39,7 @@ class Ui {
   }
 
   controlBar(heroEnergy: number) {
+    if (heroEnergy > 100) heroEnergy = 100;
     const percentage = this.bar.width / this.totalEnergy;
     this.bar.displayWidth = heroEnergy * percentage;
   }
