@@ -68,6 +68,7 @@ class Stage extends Phaser.Scene {
     this.ui.getFPS(this.game);
     this.ui.controlBar(this.hero.heroEnergy);
     this.hero.checkForCollision();
+    this.hero.checkEnergyStatus();
     this.hero.playAnimations();
     this.getInput();
     if (this.hero.isAlive) {

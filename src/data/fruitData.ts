@@ -1,4 +1,4 @@
-const fruitPositions = {
+export const fruitGroups = {
   linePositions: [
     { x: 0, y: 0 },
     { x: 32, y: 0 },
@@ -55,6 +55,20 @@ const fruitPositions = {
     { x: 128, y: -56 },
     { x: 160, y: -56 },
   ],
+
+  concaveSemiArcLongPositions: [
+    { x: 0, y: 0 },
+    { x: 32, y: +8 },
+    { x: 64, y: +16 },
+    { x: 96, y: +32 },
+    { x: 128, y: +48 },
+    { x: 144, y: +80 },
+  ],
 };
 
-export default fruitPositions;
+export const fruitPositions = [
+  { x: 192, y: 200, type: fruitGroups.lineLongPositions },
+  { x: 178, y: 200, type: fruitGroups.convexArcLongPositions },
+  { x: 300, y: 150, type: fruitGroups.convexArcPositions },
+  { x: 480, y: 32, type: fruitGroups.concaveSemiArcLongPositions },
+];
