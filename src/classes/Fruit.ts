@@ -9,11 +9,11 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
     this.scene.physics.world.enable(this);
     this.fruit.body.setAllowGravity(false);
     scene.physics.add.collider(this.fruit, hero, () => {
-      hero.score += this.points;
       this.fruit.destroy();
+      hero.score += this.points;
     });
     this.setFruitProperties(currentFruit);
-    this.fruit.body.setMass(0);
+    this.fruit.body.setMass(0.5);
     this.fruit.body.mass;
   }
 
