@@ -66,8 +66,9 @@ export const fruitGroups = {
   ],
 };
 
+//each index matches de index of maps property in Map class
 export const fruitPositions = [
-  { x: 192, y: 200, type: fruitGroups.lineLongPositions },
+  { x: 192, y: 210, type: fruitGroups.lineLongPositions },
   { x: 178, y: 200, type: fruitGroups.convexArcLongPositions },
   { x: 300, y: 150, type: fruitGroups.convexArcPositions },
   { x: 480, y: 32, type: fruitGroups.concaveSemiArcLongPositions },

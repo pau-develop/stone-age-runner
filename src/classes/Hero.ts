@@ -1,3 +1,5 @@
+import Steam from "./Steam";
+
 class Hero extends Phaser.Physics.Arcade.Sprite {
   isAlive = true;
   isJumping = false;
@@ -11,6 +13,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   isRecovering = false;
   isConsuming = false;
   score = 0;
+  counter = 5;
 
   constructor(scene, x, y, sprite) {
     super(scene, x, y, sprite);
@@ -21,12 +24,21 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     this.init();
     this.createAnimations();
     this.play("run");
+    console.log(this.anims);
   }
 
   init() {
     this.isAlive = true;
     this.body.setSize(32, 54);
     this.body.offset.y = 10;
+  }
+
+  emitSteam() {
+    this.counter++;
+    if (this.counter >= 5) {
+      new Steam(this.scene, this.x + 30, this.y + 35, "steam");
+      this.counter = 0;
+    }
   }
 
   moveHero() {
@@ -42,6 +54,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   checkForCollision() {
     if (this.body.blocked.right) this.isAlive = false;
     if (this.body.blocked.down) {
+      this.counter = 5;
       this.isJumping = false;
       this.doubleJumped = false;
       this.jumpForce = -200;
