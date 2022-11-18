@@ -57,7 +57,7 @@ class Stage extends Phaser.Scene {
       new Monkey(this, 600, 100, "monkey", this.hero, this.monkeyGroup)
     );
     this.monkeyGroup.push(
-      new Monkey(this, 664, 100, "monkey", this.hero, this.monkeyGroup)
+      new Monkey(this, 728, 100, "monkey", this.hero, this.monkeyGroup)
     );
     this.jump = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE
@@ -76,6 +76,7 @@ class Stage extends Phaser.Scene {
     this.ui.getFPS(this.game);
     this.ui.controlBar(this.hero.heroEnergy);
     this.hero.checkForCollision();
+    console.log(this.monkeyGroup);
     if (this.monkeyGroup.length > 0) {
       this.monkeyGroup.forEach((monkey) => {
         monkey.checkForCollision();

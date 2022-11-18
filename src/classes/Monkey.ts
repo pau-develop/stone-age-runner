@@ -41,7 +41,7 @@ class Monkey extends Phaser.Physics.Arcade.Sprite {
           this.canBeRemoved = true;
         }
         this.monkey.body.velocity.x = this.monkey.bounceSpeed;
-      }
+      } else if (this.isStomped) this.canBeRemoved = true;
     }
   }
 
@@ -78,6 +78,7 @@ class Monkey extends Phaser.Physics.Arcade.Sprite {
       this.isAlive
     )
       this.shouldMove = true;
+    else if (this.monkey.body.x < camera.scrollX) this.canBeRemoved = true;
   }
 
   playAnimations() {
