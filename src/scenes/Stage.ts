@@ -1,10 +1,12 @@
 import Fruit from "../classes/Fruit";
 import Hero from "../classes/Hero";
 import Map from "../classes/Map";
+import Monkey from "../classes/Monkey";
 import Steam from "../classes/Steam";
 import Ui from "../classes/Ui";
 
 class Stage extends Phaser.Scene {
+  monkey;
   hero;
   jump;
   map;
@@ -13,11 +15,16 @@ class Stage extends Phaser.Scene {
   fps;
   hasRestarted: boolean;
   fruits;
+  monkeyGroup = new Array(0);
 
   constructor() {
     super("Stage");
   }
   preload() {
+    this.load.spritesheet("monkey", "assets/monkey/monkey.png", {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
     this.load.spritesheet("fruits", "assets/collectibles/fruits.png", {
       frameWidth: 32,
       frameHeight: 32,
@@ -46,12 +53,16 @@ class Stage extends Phaser.Scene {
   create() {
     this.ui = new Ui(this, this.game);
     this.hero = new Hero(this, 64, 100, "hero");
-
+    this.monkeyGroup.push(
+      new Monkey(this, 600, 100, "monkey", this.hero, this.monkeyGroup)
+    );
+    this.monkeyGroup.push(
+      new Monkey(this, 728, 100, "monkey", this.hero, this.monkeyGroup)
+    );
     this.jump = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE
     );
-    this.map.instantiateMap(this.hero, this);
-
+    this.map.instantiateMap(this.hero, this.monkeyGroup, this);
     this.background = this.add.image(0, 0, "background");
     this.background.setOrigin(0, 0);
     this.background.setDepth(-50);
@@ -65,11 +76,21 @@ class Stage extends Phaser.Scene {
     this.ui.getFPS(this.game);
     this.ui.controlBar(this.hero.heroEnergy);
     this.hero.checkForCollision();
+    console.log(this.monkeyGroup);
+    if (this.monkeyGroup.length > 0) {
+      this.monkeyGroup.forEach((monkey) => {
+        monkey.checkForCollision();
+        monkey.checkBounds(this.cameras.main);
+        monkey.playAnimations();
+        monkey.moveMonkey();
+      });
+    }
+    this.removeMonkeys();
     this.hero.checkEnergyStatus();
     this.hero.playAnimations();
     this.getInput();
     if (this.hero.isAlive) {
-      this.map.shiftMaps(this.hero, this);
+      this.map.shiftMaps(this.hero, this.monkeyGroup, this);
       this.hero.moveHero();
     } else if (!this.hero.isAlive) {
       if (!this.hero.justCrashed) {
@@ -81,6 +102,12 @@ class Stage extends Phaser.Scene {
       else this.hero.bounceSpeed = 0;
       this.hero.body.velocity.x = this.hero.bounceSpeed;
     }
+  }
+
+  removeMonkeys() {
+    this.monkeyGroup = this.monkeyGroup.filter(
+      (monkey) => !monkey.canBeRemoved
+    );
   }
 
   getInput() {
