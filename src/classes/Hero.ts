@@ -1,3 +1,4 @@
+import FloatingText from "./FloatingText";
 import Steam from "./Steam";
 
 class Hero extends Phaser.Physics.Arcade.Sprite {
@@ -6,6 +7,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   doubleJumped = false;
   jumpLimit: number;
   jumpForce = -200;
+  hitMobForce = -300;
   justCrashed = false;
   bounceSpeed = -50;
   heroSpeed = 250;
@@ -14,6 +16,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   isConsuming = false;
   score = 0;
   counter = 5;
+  isCrashed = false;
 
   constructor(scene, x, y, sprite) {
     super(scene, x, y, sprite);
@@ -24,7 +27,6 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     this.init();
     this.createAnimations();
     this.play("run");
-    console.log(this.anims);
   }
 
   init() {
@@ -77,6 +79,30 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
         clearInterval(interval);
       }, 250);
     }
+  }
+
+  setColliders(monkey) {
+    this.scene.physics.add.collider(monkey, this, () => {
+      monkey.shouldMove = false;
+      if (this.body.touching.right) {
+        this.isCrashed = true;
+        this.isAlive = false;
+        monkey.justCrashed = true;
+        monkey.body.velocity.x = 0;
+      } else if (this.body.touching.down) {
+        this.score += 1000;
+        this.heroEnergy += 15;
+        new FloatingText(
+          this.scene,
+          1000,
+          this.body.position.x,
+          this.body.position.y
+        );
+        this.body.velocity.y = this.hitMobForce;
+        monkey.isStomped = true;
+      }
+      monkey.isAlive = false;
+    });
   }
 
   consumeEnergyBar() {
@@ -165,7 +191,12 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
         this.play("run");
       }
     } else {
-      if (this.body.blocked.right && this.anims.currentAnim.key !== "crash") {
+      if (
+        (this.body.blocked.right && this.anims.currentAnim.key !== "crash") ||
+        (this.isCrashed &&
+          this.body.touching.right &&
+          this.anims.currentAnim.key !== "crash")
+      ) {
         this.play("crash");
       } else if (
         this.anims.currentAnim.key === "crash" &&
