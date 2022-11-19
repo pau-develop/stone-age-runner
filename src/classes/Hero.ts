@@ -99,6 +99,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
           this.body.position.y
         );
         this.body.velocity.y = this.hitMobForce;
+        this.doubleJumped = false;
         monkey.isStomped = true;
         monkey.body.velocity.x = 0;
       }
