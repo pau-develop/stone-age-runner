@@ -7,15 +7,14 @@ class Monkey extends Phaser.Physics.Arcade.Sprite {
   isStomped = false;
   shouldMove = false;
   canBeRemoved = false;
-  monkeyGroup;
-  constructor(scene, x, y, sprite, hero, monkeyGroup) {
+  constructor(scene, x, y, sprite, hero, map) {
     super(scene, x, y, sprite);
-    this.monkeyGroup = monkeyGroup;
     this.scene = scene;
     this.monkey = this.scene.add.existing(this);
     this.scene.physics.world.enable(this);
     this.setOrigin(0, 0);
     hero.setColliders(this.monkey);
+    // map.setColliders(this.monkey);
     this.init();
     this.createAnimations();
     this.play("run");
@@ -28,13 +27,16 @@ class Monkey extends Phaser.Physics.Arcade.Sprite {
 
   moveMonkey() {
     if (this.shouldMove) {
+      console.log("HEY!");
       this.monkey.body.velocity.x = -100;
+      this.monkey.body.x = Math.round(this.monkey.body.x);
     }
   }
 
   checkForCollision() {
     if (!this.isAlive) {
       if (this.justCrashed) {
+        console.log("si???");
         if (this.monkey.bounceSpeed > 0) this.monkey.bounceSpeed -= 1;
         else {
           this.monkey.bounceSpeed = 0;
@@ -42,6 +44,12 @@ class Monkey extends Phaser.Physics.Arcade.Sprite {
         }
         this.monkey.body.velocity.x = this.monkey.bounceSpeed;
       } else if (this.isStomped) this.canBeRemoved = true;
+    } else {
+      if (this.monkey.body.blocked.left) {
+        this.shouldMove = false;
+        this.justCrashed = true;
+        this.isAlive = false;
+      }
     }
   }
 
@@ -51,6 +59,8 @@ class Monkey extends Phaser.Physics.Arcade.Sprite {
     this.createAnimation("crash-air", 22, 23, 25, 0);
     this.createAnimation("crash-land", 24, 29, 25, 0);
     this.createAnimation("stomped", 30, 35, 18, 0);
+    this.createAnimation("fall", 39, 40, 5, 0);
+    this.createAnimation("land", 41, 44, 25, 0);
   }
 
   createAnimation(
@@ -84,8 +94,30 @@ class Monkey extends Phaser.Physics.Arcade.Sprite {
   playAnimations() {
     if (this.isAlive) {
       //nothing
+      if (
+        !this.body.blocked.down &&
+        this.body.velocity.y > 0 &&
+        this.anims.currentAnim.key !== "fall"
+      )
+        this.play("fall");
+      else if (
+        this.body.blocked.down &&
+        this.anims.currentAnim.key !== "run" &&
+        this.anims.currentAnim.key !== "land"
+      ) {
+        this.play("land");
+      } else if (
+        this.body.blocked.down &&
+        this.anims.currentAnim.key === "land" &&
+        this.anims.currentFrame.index === 4
+      ) {
+        this.play("run");
+      }
     } else if (!this.isAlive) {
-      if (this.body.touching.left && this.anims.currentAnim.key !== "crash") {
+      if (
+        (this.body.touching.left && this.anims.currentAnim.key !== "crash") ||
+        (this.body.blocked.left && this.anims.currentAnim.key !== "crash")
+      ) {
         this.play("crash");
       } else if (
         this.anims.currentAnim.key === "crash" &&

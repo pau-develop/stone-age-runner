@@ -1,5 +1,6 @@
-import { fruitGroups, fruitPositions } from "../data/fruitData";
+import { fruitGroups, fruitPositions, monkeyPositions } from "../data/mapData";
 import Fruit from "./Fruit";
+import Monkey from "./Monkey";
 
 class Map {
   maps = [
@@ -9,7 +10,12 @@ class Map {
     "assets/tiles/map3.json",
   ];
   scrollingMap = new Array(3);
-
+  camera;
+  scene;
+  constructor(camera, scene) {
+    this.camera = camera;
+    this.scene = scene;
+  }
   public instantiateMap(hero, monkeyGroup, scene) {
     for (let i = 0; i < this.scrollingMap.length; i++) {
       const map = scene.make.tilemap({ key: `tilemap${i}` });
@@ -17,7 +23,7 @@ class Map {
         "ground",
         map.addTilesetImage("wild", "tiles")
       );
-      map.setCollision([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      map.setCollision([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
       scene.physics.add.collider(hero, this.scrollingMap[i]);
       if (monkeyGroup.length > 0) {
         monkeyGroup.forEach((monkey) =>
@@ -42,14 +48,17 @@ class Map {
         map.createLayer("ground", map.addTilesetImage("wild", "tiles"))
       );
       this.scrollingMap[2].x = this.scrollingMap[1].x + 640;
-      map.setCollision([1, 2, 3, 4, 5, 6, 7, 8, 9]);
-      scene.physics.add.collider(hero, this.scrollingMap[2]);
-      if (monkeyGroup.length > 0) {
-        monkeyGroup.forEach((monkey) => {
-          scene.physics.add.collider(monkey, this.scrollingMap[2]);
-        });
-      }
+      map.setCollision([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
       this.addCollectibles(hero, scene, randomMap, this.scrollingMap[2]);
+      this.addMonkeys(
+        scene,
+        hero,
+        randomMap,
+        this.scrollingMap[2].x,
+        monkeyGroup
+      );
+      scene.physics.add.collider(hero, this.scrollingMap[2]);
     }
   }
 
@@ -65,6 +74,32 @@ class Map {
       );
     }
   }
+
+  addMonkeys(scene, hero, mapNumber, mapPosition, monkeyGroup) {
+    if (mapNumber <= monkeyPositions.length - 1) {
+      monkeyGroup.push(
+        new Monkey(
+          scene,
+          mapPosition + monkeyPositions[mapNumber].x,
+          monkeyPositions[mapNumber].y,
+          "monkey",
+          hero,
+          this
+        )
+      );
+      monkeyGroup.forEach((monkey) => {
+        scene.physics.add.collider(monkey, this.scrollingMap[0]);
+        scene.physics.add.collider(monkey, this.scrollingMap[1]);
+        scene.physics.add.collider(monkey, this.scrollingMap[2]);
+      });
+    }
+  }
+
+  // setColliders(monkey) {
+  //   this.scene.physics.add.collider(monkey, this.scrollingMap[0]);
+  //   this.scene.physics.add.collider(monkey, this.scrollingMap[1]);
+  //   this.scene.physics.add.collider(monkey, this.scrollingMap[2]);
+  // }
 
   spawnFruits(hero, scene, xPos, yPos, mapPosition, fruitGroup) {
     for (let i = 0; i < fruitGroup.length; i++) {
