@@ -16,11 +16,12 @@ class Stage extends Phaser.Scene {
   hasRestarted: boolean;
   fruits;
   monkeyGroup = new Array(0);
-
+  meters;
   constructor() {
     super("Stage");
   }
   preload() {
+    this.monkeyGroup = new Array(0);
     this.load.spritesheet("monkey", "assets/monkey/monkey.png", {
       frameWidth: 64,
       frameHeight: 64,
@@ -72,6 +73,8 @@ class Stage extends Phaser.Scene {
   }
 
   update() {
+    this.meters = Math.round(this.cameras.main.scrollX / 64);
+    this.ui.displayDistance(this.meters);
     this.ui.displayScore(this.hero.score);
     this.ui.getFPS(this.game);
     this.ui.controlBar(this.hero.heroEnergy);
