@@ -149,23 +149,29 @@ class Stage extends Phaser.Scene {
       });
       //HOLD
       if (this.jump.isDown && this.hero.isJumping) {
-        if (this.hero.y > this.hero.jumpLimit) {
-          this.hero.body.velocity.y = this.hero.jumpForce;
-          this.hero.jumpForce += 2;
-          if (this.hero.doubleJumped && this.hero.heroEnergy > 0) {
+        if (!this.hero.doubleJumped) {
+          if (this.hero.y > this.hero.jumpLimit) {
+            this.hero.body.velocity.y = this.hero.jumpForce;
+            this.hero.jumpForce += 2;
+          } else {
+            this.hero.isJumping = false;
+          }
+        } else if (this.hero.doubleJumped) {
+          if (this.hero.heroEnergy > 0) {
+            this.hero.body.velocity.y = this.hero.jumpForce;
             this.hero.consumeEnergyBar();
             this.hero.emitSteam();
-          } else if (this.hero.doubleJumped && this.hero.heroEnergy <= 0)
-            this.hero.isJumping = false;
-        } else {
-          this.hero.isJumping = false;
+          } else if (this.hero.heroEnergy <= 0) this.hero.isJumping = false;
         }
       }
       //RELEASE
       this.jump.on("up", () => {
         this.hero.isJumping = false;
+        this.hero.doubleJumped = false;
       });
-    } else {
+    }
+    //UI CONTROLS
+    else {
       this.jump.on("up", () => {
         if (
           !this.hasRestarted &&

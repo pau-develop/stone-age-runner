@@ -189,10 +189,12 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
         !this.body.blocked.down &&
         this.body.velocity.y <= 0 &&
         this.anims.currentAnim.key !== "jump" &&
+        this.anims.currentAnim.key !== "double-jump" &&
         !this.doubleJumped
-      )
+      ) {
+        console.log("HYA!!!!!!!!!!");
         this.play("jump");
-      else if (
+      } else if (
         !this.body.blocked.down &&
         this.body.velocity.y <= 0 &&
         this.anims.currentAnim.key !== "double-jump" &&
@@ -203,14 +205,14 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
         !this.body.blocked.down &&
         this.body.velocity.y > 0 &&
         this.anims.currentAnim.key !== "fall" &&
-        !this.doubleJumped
+        this.anims.currentAnim.key === "jump"
       )
         this.play("fall");
       else if (
         !this.body.blocked.down &&
         this.body.velocity.y > 0 &&
         this.anims.currentAnim.key !== "double-jump-fall" &&
-        this.doubleJumped
+        this.anims.currentAnim.key === "double-jump"
       )
         this.play("double-jump-fall");
       else if (
