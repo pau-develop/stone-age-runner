@@ -17,8 +17,9 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   score = 0;
   counter = 5;
   isCrashed = false;
+  heroSounds = new Array();
 
-  constructor(scene, x, y, sprite) {
+  constructor(scene, x, y, sprite, heroSounds) {
     super(scene, x, y, sprite);
     this.scene = scene;
     this.scene.add.existing(this);
@@ -27,6 +28,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     this.init();
     this.createAnimations();
     this.play("run");
+    this.heroSounds = heroSounds;
   }
 
   init() {
@@ -54,7 +56,9 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   }
 
   checkForCollision() {
-    if (this.body.blocked.right) this.isAlive = false;
+    if (this.body.blocked.right) {
+      this.isAlive = false;
+    }
     if (this.body.blocked.down) {
       this.counter = 5;
       this.isJumping = false;
@@ -90,6 +94,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
         monkey.justCrashed = true;
         monkey.body.velocity.x = 0;
       } else if (this.body.touching.down) {
+        this.heroSounds[1].play();
         this.score += 1000;
         this.heroEnergy += 15;
         new FloatingText(
@@ -147,6 +152,35 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
       frameRate: rate,
       repeat: repeat,
     });
+  }
+
+  playSounds() {
+    //STEP
+    if (this.anims.currentAnim.key === "run") {
+      if (this.anims.currentFrame.index === 3) {
+        this.heroSounds[0].play();
+      } else if (this.anims.currentFrame.index === 9) {
+        this.heroSounds[0].play();
+      }
+    } else if (
+      this.anims.currentAnim.key === "land" &&
+      this.anims.currentFrame.index === 1
+    )
+      this.heroSounds[0].play();
+    //HIT
+    else if (
+      this.anims.currentAnim.key === "crash" &&
+      this.anims.currentFrame.index === 1
+    )
+      this.heroSounds[1].play();
+    //JUMP
+    else if (this.anims.currentAnim.key === "jump") {
+      if (this.body.velocity.y < 0 && this.anims.currentFrame.index === 1)
+        this.heroSounds[3].play();
+      else if (this.body.velocity.y >= 0) {
+        this.heroSounds[3].stop();
+      }
+    }
   }
 
   playAnimations() {

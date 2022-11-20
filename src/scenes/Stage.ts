@@ -18,11 +18,17 @@ class Stage extends Phaser.Scene {
   monkeyGroup = new Array(0);
   meters;
   music;
+  heroSounds = new Array();
   constructor() {
     super("Stage");
   }
   preload() {
+    this.load.audio("step", "assets/fx/STEP1VOLUME.wav");
+    this.load.audio("hit", "assets/fx/CRASH1.wav");
+    this.load.audio("eat", "assets/fx/EAT2.wav");
+    this.load.audio("jump", "assets/fx/JUMP2LLARG.wav");
     this.load.audio("track", "assets/music/TRACK.wav");
+
     this.monkeyGroup = new Array(0);
     this.load.spritesheet("monkey", "assets/monkey/monkey.png", {
       frameWidth: 64,
@@ -54,12 +60,16 @@ class Stage extends Phaser.Scene {
     this.hasRestarted = false;
   }
   create() {
-    if (!this.hasRestarted) {
-      this.music = this.sound.add("track");
-      this.music.play();
-    }
+    this.heroSounds.push(this.sound.add("step", { loop: false }));
+    this.heroSounds.push(this.sound.add("hit", { loop: false }));
+    this.heroSounds.push(this.sound.add("eat", { loop: false, volume: 0.2 }));
+    this.heroSounds.push(this.sound.add("jump", { loop: false }));
+    this.map.getSound(this.heroSounds[2]);
+    this.music = this.sound.add("track", { loop: true });
+    this.music.play();
+
     this.ui = new Ui(this, this.game);
-    this.hero = new Hero(this, 64, 100, "hero");
+    this.hero = new Hero(this, 64, 100, "hero", this.heroSounds);
     this.monkeyGroup.push(
       new Monkey(this, 600, 100, "monkey", this.hero, this.map)
     );
@@ -95,6 +105,7 @@ class Stage extends Phaser.Scene {
     }
     this.removeMonkeys();
     this.hero.checkEnergyStatus();
+    this.hero.playSounds();
     this.hero.playAnimations();
     this.getInput();
     if (this.hero.isAlive) {
