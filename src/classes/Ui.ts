@@ -6,6 +6,8 @@ class Ui {
   totalEnergy = 100;
   fps;
   fpsShadow;
+  distance;
+  distanceShadow;
   die;
   dieShadow;
   score;
@@ -39,6 +41,15 @@ class Ui {
       .bitmapText(10, 30, "2p", "Score: 0", 8)
       .setScrollFactor(0)
       .setTint(0xeee300, 0xeee300, 0xee3600, 0xee3600);
+
+    this.distanceShadow = scene.add
+      .bitmapText(11, 51, "2p", "Distance: 0", 8)
+      .setScrollFactor(0)
+      .setTint(0x000000, 0x000000, 0x000000, 0x000000);
+    this.distance = scene.add
+      .bitmapText(10, 50, "2p", "Distance: 0", 8)
+      .setScrollFactor(0)
+      .setTint(0xeee300, 0xeee300, 0xee3600, 0xee3600);
   }
 
   getFPS(game) {
@@ -49,6 +60,10 @@ class Ui {
   displayScore(score) {
     this.score.text = "Score: " + score;
     this.scoreShadow.text = "Score: " + score;
+  }
+  displayDistance(meters) {
+    this.distance.text = "Distance: " + meters + " m";
+    this.distanceShadow.text = "Distance: " + meters + " m";
   }
 
   controlBar(heroEnergy: number) {
