@@ -27,7 +27,6 @@ class Monkey extends Phaser.Physics.Arcade.Sprite {
 
   moveMonkey() {
     if (this.shouldMove) {
-      console.log("HEY!");
       this.monkey.body.velocity.x = -100;
       this.monkey.body.x = Math.round(this.monkey.body.x);
     }
@@ -36,7 +35,6 @@ class Monkey extends Phaser.Physics.Arcade.Sprite {
   checkForCollision() {
     if (!this.isAlive) {
       if (this.justCrashed) {
-        console.log("si???");
         if (this.monkey.bounceSpeed > 0) this.monkey.bounceSpeed -= 1;
         else {
           this.monkey.bounceSpeed = 0;

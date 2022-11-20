@@ -21,6 +21,7 @@ class Stage extends Phaser.Scene {
     super("Stage");
   }
   preload() {
+    this.monkeyGroup = new Array(0);
     this.load.spritesheet("monkey", "assets/monkey/monkey.png", {
       frameWidth: 64,
       frameHeight: 64,
