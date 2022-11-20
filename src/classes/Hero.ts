@@ -181,6 +181,16 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
         this.heroSounds[3].stop();
       }
     }
+    //DOUBLE-JUMP
+    else if (
+      this.anims.currentAnim.key === "double-jump" &&
+      this.anims.currentFrame.index === 2
+    ) {
+      this.heroSounds[4].play();
+    } else if (this.anims.currentAnim.key === "double-jump-fall") {
+      console.log("DISH!");
+      this.heroSounds[4].stop();
+    }
   }
 
   playAnimations() {
@@ -192,7 +202,6 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
         this.anims.currentAnim.key !== "double-jump" &&
         !this.doubleJumped
       ) {
-        console.log("HYA!!!!!!!!!!");
         this.play("jump");
       } else if (
         !this.body.blocked.down &&

@@ -28,6 +28,7 @@ class Stage extends Phaser.Scene {
     this.load.audio("eat", "assets/fx/EAT2.wav");
     this.load.audio("jump", "assets/fx/JUMP2LLARG.wav");
     this.load.audio("track", "assets/music/TRACK.wav");
+    this.load.audio("double-jump", "assets/fx/FART2.wav");
 
     this.monkeyGroup = new Array(0);
     this.load.spritesheet("monkey", "assets/monkey/monkey.png", {
@@ -64,6 +65,7 @@ class Stage extends Phaser.Scene {
     this.heroSounds.push(this.sound.add("hit", { loop: false }));
     this.heroSounds.push(this.sound.add("eat", { loop: false, volume: 0.2 }));
     this.heroSounds.push(this.sound.add("jump", { loop: false }));
+    this.heroSounds.push(this.sound.add("double-jump", { loop: true }));
     this.map.getSound(this.heroSounds[2]);
     this.music = this.sound.add("track", { loop: true });
     this.music.play();
