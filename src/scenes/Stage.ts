@@ -17,10 +17,12 @@ class Stage extends Phaser.Scene {
   fruits;
   monkeyGroup = new Array(0);
   meters;
+  music;
   constructor() {
     super("Stage");
   }
   preload() {
+    this.load.audio("track", "assets/music/TRACK.wav");
     this.monkeyGroup = new Array(0);
     this.load.spritesheet("monkey", "assets/monkey/monkey.png", {
       frameWidth: 64,
@@ -52,6 +54,10 @@ class Stage extends Phaser.Scene {
     this.hasRestarted = false;
   }
   create() {
+    if (!this.hasRestarted) {
+      this.music = this.sound.add("track");
+      this.music.play();
+    }
     this.ui = new Ui(this, this.game);
     this.hero = new Hero(this, 64, 100, "hero");
     this.monkeyGroup.push(
@@ -155,6 +161,7 @@ class Stage extends Phaser.Scene {
           !this.hero.isAlive &&
           this.ui.die !== undefined
         ) {
+          this.music.stop();
           this.scene.restart();
           this.hasRestarted = true;
         }
