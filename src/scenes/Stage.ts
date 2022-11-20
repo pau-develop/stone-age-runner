@@ -17,10 +17,19 @@ class Stage extends Phaser.Scene {
   fruits;
   monkeyGroup = new Array(0);
   meters;
+  music;
+  heroSounds = new Array();
   constructor() {
     super("Stage");
   }
   preload() {
+    this.load.audio("step", "assets/fx/STEP1VOLUME.wav");
+    this.load.audio("hit", "assets/fx/CRASH1.wav");
+    this.load.audio("eat", "assets/fx/EAT2.wav");
+    this.load.audio("jump", "assets/fx/JUMP2LLARG.wav");
+    this.load.audio("track", "assets/music/TRACK.wav");
+    this.load.audio("double-jump", "assets/fx/FART2.wav");
+
     this.monkeyGroup = new Array(0);
     this.load.spritesheet("monkey", "assets/monkey/monkey.png", {
       frameWidth: 64,
@@ -52,8 +61,17 @@ class Stage extends Phaser.Scene {
     this.hasRestarted = false;
   }
   create() {
+    this.heroSounds.push(this.sound.add("step", { loop: false }));
+    this.heroSounds.push(this.sound.add("hit", { loop: false }));
+    this.heroSounds.push(this.sound.add("eat", { loop: false, volume: 0.2 }));
+    this.heroSounds.push(this.sound.add("jump", { loop: false }));
+    this.heroSounds.push(this.sound.add("double-jump", { loop: true }));
+    this.map.getSound(this.heroSounds[2]);
+    this.music = this.sound.add("track", { loop: true });
+    this.music.play();
+
     this.ui = new Ui(this, this.game);
-    this.hero = new Hero(this, 64, 100, "hero");
+    this.hero = new Hero(this, 64, 100, "hero", this.heroSounds);
     this.monkeyGroup.push(
       new Monkey(this, 600, 100, "monkey", this.hero, this.map)
     );
@@ -89,6 +107,7 @@ class Stage extends Phaser.Scene {
     }
     this.removeMonkeys();
     this.hero.checkEnergyStatus();
+    this.hero.playSounds();
     this.hero.playAnimations();
     this.getInput();
     if (this.hero.isAlive) {
@@ -122,7 +141,11 @@ class Stage extends Phaser.Scene {
           this.hero.isJumping = true;
           return;
         }
-        if (!this.hero.body.blocked.down && !this.hero.doubleJumped) {
+        if (
+          !this.hero.body.blocked.down &&
+          !this.hero.doubleJumped &&
+          this.hero.heroEnergy > 0
+        ) {
           this.hero.doubleJumped = true;
           this.hero.jumpLimit = this.hero.y - 100;
           this.hero.jumpForce = -200;
@@ -132,29 +155,36 @@ class Stage extends Phaser.Scene {
       });
       //HOLD
       if (this.jump.isDown && this.hero.isJumping) {
-        if (this.hero.y > this.hero.jumpLimit) {
-          this.hero.body.velocity.y = this.hero.jumpForce;
-          this.hero.jumpForce += 2;
-          if (this.hero.doubleJumped && this.hero.heroEnergy > 0) {
+        if (!this.hero.doubleJumped) {
+          if (this.hero.y > this.hero.jumpLimit) {
+            this.hero.body.velocity.y = this.hero.jumpForce;
+            this.hero.jumpForce += 2;
+          } else {
+            this.hero.isJumping = false;
+          }
+        } else if (this.hero.doubleJumped) {
+          if (this.hero.heroEnergy > 0) {
+            this.hero.body.velocity.y = this.hero.jumpForce;
             this.hero.consumeEnergyBar();
             this.hero.emitSteam();
-          } else if (this.hero.doubleJumped && this.hero.heroEnergy <= 0)
-            this.hero.isJumping = false;
-        } else {
-          this.hero.isJumping = false;
+          } else if (this.hero.heroEnergy <= 0) this.hero.isJumping = false;
         }
       }
       //RELEASE
       this.jump.on("up", () => {
         this.hero.isJumping = false;
+        this.hero.doubleJumped = false;
       });
-    } else {
+    }
+    //UI CONTROLS
+    else {
       this.jump.on("up", () => {
         if (
           !this.hasRestarted &&
           !this.hero.isAlive &&
           this.ui.die !== undefined
         ) {
+          this.music.stop();
           this.scene.restart();
           this.hasRestarted = true;
         }

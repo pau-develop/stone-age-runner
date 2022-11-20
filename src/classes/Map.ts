@@ -12,6 +12,7 @@ class Map {
   scrollingMap = new Array(3);
   camera;
   scene;
+  eatFX;
   constructor(camera, scene) {
     this.camera = camera;
     this.scene = scene;
@@ -35,6 +36,10 @@ class Map {
       if (i === 1) this.scrollingMap[i].x = 640;
       if (i === 2) this.scrollingMap[i].x = 1280;
     }
+  }
+
+  getSound(sound) {
+    this.eatFX = sound;
   }
 
   public shiftMaps(hero, monkeyGroup, scene) {
@@ -110,7 +115,8 @@ class Map {
         "fruits",
         Math.round(Math.random() * 4),
         hero,
-        i % 2 === 0 ? 1 : -1
+        i % 2 === 0 ? 1 : -1,
+        this.eatFX
       );
     }
   }

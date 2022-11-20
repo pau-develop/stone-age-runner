@@ -9,7 +9,7 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
   topOffset;
   botOffset;
   oscillationSpeed = 20;
-  constructor(scene, x, y, sprite, currentFruit, hero, direction) {
+  constructor(scene, x, y, sprite, currentFruit, hero, direction, eatFX) {
     super(scene, x, y, sprite);
     this.fruit = scene.add.existing(this).setFrame(currentFruit);
     this.setOrigin(0, 0);
@@ -22,6 +22,7 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
         this.fruit.body.x,
         this.fruit.body.y
       );
+      eatFX.play();
       this.fruit.destroy();
       hero.score += this.points;
       hero.heroEnergy += this.energy;
