@@ -141,7 +141,11 @@ class Stage extends Phaser.Scene {
           this.hero.isJumping = true;
           return;
         }
-        if (!this.hero.body.blocked.down && !this.hero.doubleJumped) {
+        if (
+          !this.hero.body.blocked.down &&
+          !this.hero.doubleJumped &&
+          this.hero.heroEnergy > 0
+        ) {
           this.hero.doubleJumped = true;
           this.hero.jumpLimit = this.hero.y - 100;
           this.hero.jumpForce = -200;
