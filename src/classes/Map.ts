@@ -5,9 +5,14 @@ import Monkey from "./Monkey";
 class Map {
   maps = [
     "assets/tiles/map0.json",
+    "assets/tiles/map6.json",
+    "assets/tiles/map5.json",
+    "assets/tiles/map4.json",
+    "assets/tiles/map4.json",
+    "assets/tiles/map4.json",
+    "assets/tiles/map3.json",
     "assets/tiles/map1.json",
     "assets/tiles/map2.json",
-    "assets/tiles/map3.json",
   ];
   scrollingMap = new Array(3);
   camera;
@@ -20,21 +25,47 @@ class Map {
   public instantiateMap(hero, monkeyGroup, scene) {
     for (let i = 0; i < this.scrollingMap.length; i++) {
       const map = scene.make.tilemap({ key: `tilemap${i}` });
-      this.scrollingMap[i] = map.createLayer(
-        "ground",
-        map.addTilesetImage("wild", "tiles")
-      );
-      map.setCollision([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-      scene.physics.add.collider(hero, this.scrollingMap[i]);
+      this.scrollingMap[i] = {
+        ground: map.createLayer("ground", map.addTilesetImage("wild", "tiles")),
+        back: map.createLayer(
+          "ground-back",
+          map.addTilesetImage("wild", "tiles")
+        ),
+        front: map.createLayer(
+          "ground-front",
+          map.addTilesetImage("wild", "tiles")
+        ),
+      };
+      //NO 1,2,3,4,5,6,9,10,11,14,15,18
+      //SI 7,8,12,13,16,17
+      this.scrollingMap[i].ground.setCollision([
+        7, 8, 12, 13, 14, 16, 17, 18, 26, 28, 30, 34, 37, 40, 41, 42, 51,
+      ]);
+      scene.physics.add.collider(hero, this.scrollingMap[i].ground);
       if (monkeyGroup.length > 0) {
         monkeyGroup.forEach((monkey) =>
-          scene.physics.add.collider(monkey, this.scrollingMap[i])
+          scene.physics.add.collider(monkey, this.scrollingMap[i].ground)
         );
       }
-
-      if (i === 0) this.scrollingMap[i].x = 0;
-      if (i === 1) this.scrollingMap[i].x = 640;
-      if (i === 2) this.scrollingMap[i].x = 1280;
+      // debugger;
+      if (i === 0) {
+        this.scrollingMap[i].ground.x = 0;
+        this.scrollingMap[i].back.x = 0;
+        if (this.scrollingMap[i].front !== null)
+          this.scrollingMap[i].front.x = 0;
+      }
+      if (i === 1) {
+        this.scrollingMap[i].ground.x = 2560;
+        this.scrollingMap[i].back.x = 2560;
+        if (this.scrollingMap[i].front !== null)
+          this.scrollingMap[i].front.x = 2560;
+      }
+      if (i === 2) {
+        this.scrollingMap[i].ground.x = 5120;
+        this.scrollingMap[i].back.x = 5120;
+        if (this.scrollingMap[i].front !== null)
+          this.scrollingMap[i].front.x = 5120;
+      }
     }
   }
 
@@ -43,27 +74,44 @@ class Map {
   }
 
   public shiftMaps(hero, monkeyGroup, scene) {
-    //REMOVE FIRST INDEX WHEN PLAYER REACHES x 640
-    if (hero.x >= this.scrollingMap[0].x + 640) this.scrollingMap.shift();
-    //ADD IT TO THE END OF THE ARRAY
+    // REMOVE FIRST INDEX WHEN PLAYER REACHES x 640
+    if (hero.x >= this.scrollingMap[0].ground.x + 1280)
+      this.scrollingMap.shift();
+    // ADD IT TO THE END OF THE ARRAY
     if (this.scrollingMap.length < 3) {
       const randomMap = Math.floor(Math.random() * this.maps.length);
       const map = scene.make.tilemap({ key: `tilemap${randomMap}` });
-      this.scrollingMap.push(
-        map.createLayer("ground", map.addTilesetImage("wild", "tiles"))
-      );
-      this.scrollingMap[2].x = this.scrollingMap[1].x + 640;
-      map.setCollision([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
+      this.scrollingMap.push({
+        ground: map.createLayer("ground", map.addTilesetImage("wild", "tiles")),
+        back: map.createLayer(
+          "ground-back",
+          map.addTilesetImage("wild", "tiles")
+        ),
+        front: map.createLayer(
+          "ground-front",
+          map.addTilesetImage("wild", "tiles")
+        ),
+      });
+      this.scrollingMap[2].ground.x = this.scrollingMap[1].ground.x + 2560;
+
+      this.scrollingMap[2].back.x = this.scrollingMap[1].ground.x + 2560;
+      if (this.scrollingMap[2].front !== null)
+        this.scrollingMap[2].front.x = this.scrollingMap[1].ground.x + 2560;
+
+      this.scrollingMap[2].ground.setCollision([
+        7, 8, 12, 13, 14, 16, 17, 18, 26, 28, 30, 34, 37, 40, 41, 42, 51,
+      ]);
 
       this.addCollectibles(hero, scene, randomMap, this.scrollingMap[2]);
       this.addMonkeys(
         scene,
         hero,
         randomMap,
-        this.scrollingMap[2].x,
+        this.scrollingMap[2].ground.x,
         monkeyGroup
       );
-      scene.physics.add.collider(hero, this.scrollingMap[2]);
+      scene.physics.add.collider(hero, this.scrollingMap[2].ground);
     }
   }
 
@@ -93,9 +141,9 @@ class Map {
         )
       );
       monkeyGroup.forEach((monkey) => {
-        scene.physics.add.collider(monkey, this.scrollingMap[0]);
-        scene.physics.add.collider(monkey, this.scrollingMap[1]);
-        scene.physics.add.collider(monkey, this.scrollingMap[2]);
+        scene.physics.add.collider(monkey, this.scrollingMap[0].ground);
+        scene.physics.add.collider(monkey, this.scrollingMap[1].ground);
+        scene.physics.add.collider(monkey, this.scrollingMap[2].ground);
       });
     }
   }

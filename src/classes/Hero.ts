@@ -18,6 +18,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   counter = 5;
   isCrashed = false;
   heroSounds = new Array();
+  checkBlocked = false;
 
   constructor(scene, x, y, sprite, heroSounds) {
     super(scene, x, y, sprite);
@@ -25,6 +26,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     this.scene.add.existing(this);
     this.scene.physics.world.enable(this);
     this.setOrigin(0, 0);
+    this.setDepth(50);
     this.init();
     this.createAnimations();
     this.play("run");
@@ -56,10 +58,27 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   }
 
   checkForCollision() {
-    if (this.body.blocked.right) {
-      this.isAlive = false;
+    if (this.body.blocked.up) {
+      console.log("TOP!!!");
+      this.body.y = this.body.y + 2;
+      this.isJumping = false;
+      this.body.velocity.y = +20;
+      return;
     }
+    if (this.body.blocked.right) {
+      if (!this.checkBlocked) {
+        console.log("CARDALI!", this.body.y);
+        this.body.y = this.body.y + 2;
+        console.log("RESULT?", this.body.y);
+        this.checkBlocked = true;
+        return;
+      } else {
+        if (!this.body.blocked.up) this.isAlive = false;
+      }
+    }
+
     if (this.body.blocked.down) {
+      this.checkBlocked = false;
       this.counter = 5;
       this.isJumping = false;
       this.doubleJumped = false;
@@ -155,7 +174,6 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   }
 
   playSounds() {
-    //STEP
     if (this.anims.currentAnim.key === "run") {
       if (this.anims.currentFrame.index === 3) {
         this.heroSounds[0].play();
@@ -187,8 +205,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
       this.anims.currentFrame.index === 2
     ) {
       this.heroSounds[4].play();
-    } else if (this.anims.currentAnim.key === "double-jump-fall") {
-      console.log("DISH!");
+    } else if (this.anims.currentAnim.key === "fall") {
       this.heroSounds[4].stop();
     }
   }
@@ -213,8 +230,8 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
       else if (
         !this.body.blocked.down &&
         this.body.velocity.y > 0 &&
-        this.anims.currentAnim.key !== "fall" &&
-        this.anims.currentAnim.key === "jump"
+        this.anims.currentAnim.key !== "fall"
+        // this.anims.currentAnim.key === "jump"
       )
         this.play("fall");
       else if (
