@@ -59,7 +59,6 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
 
   checkForCollision() {
     if (this.body.blocked.up) {
-      console.log("TOP!!!");
       this.body.y = this.body.y + 2;
       this.isJumping = false;
       this.body.velocity.y = +20;
@@ -67,9 +66,8 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     }
     if (this.body.blocked.right) {
       if (!this.checkBlocked) {
-        console.log("CARDALI!", this.body.y);
         this.body.y = this.body.y + 2;
-        console.log("RESULT?", this.body.y);
+
         this.checkBlocked = true;
         return;
       } else {
