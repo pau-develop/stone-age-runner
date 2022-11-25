@@ -74,12 +74,12 @@ class Stage extends Phaser.Scene {
 
     this.ui = new Ui(this, this.game);
     this.hero = new Hero(this, 64, 100, "hero", this.heroSounds);
-    this.monkeyGroup.push(
-      new Monkey(this, 600, 100, "monkey", this.hero, this.map)
-    );
-    this.monkeyGroup.push(
-      new Monkey(this, 728, 100, "monkey", this.hero, this.map)
-    );
+    // this.monkeyGroup.push(
+    //   new Monkey(this, 664, 100, "monkey", this.hero, this.map)
+    // );
+    // this.monkeyGroup.push(
+    //   new Monkey(this, 792, 100, "monkey", this.hero, this.map)
+    // );
     this.jump = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
     this.accelerate = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.RIGHT
@@ -97,12 +97,14 @@ class Stage extends Phaser.Scene {
   }
 
   update() {
+    console.log(this.hero.x, this.hero.y);
     this.meters = Math.round(this.cameras.main.scrollX / 64);
     this.ui.displayDistance(this.meters);
     this.ui.displayScore(this.hero.score);
     this.ui.getFPS(this.game);
     this.ui.controlBar(this.hero.heroEnergy);
     this.hero.checkForCollision();
+    this.hero.checkSpiked();
     if (this.monkeyGroup.length > 0) {
       this.monkeyGroup.forEach((monkey) => {
         monkey.checkForCollision();
@@ -125,9 +127,11 @@ class Stage extends Phaser.Scene {
         this.hero.body.velocity.y = 0;
         this.hero.justCrashed = true;
       }
-      if (this.hero.bounceSpeed < 0) this.hero.bounceSpeed += 1;
-      else this.hero.bounceSpeed = 0;
-      this.hero.body.velocity.x = this.hero.bounceSpeed;
+      if (!this.hero.isSpiked) {
+        if (this.hero.bounceSpeed < 0) this.hero.bounceSpeed += 1;
+        else this.hero.bounceSpeed = 0;
+        this.hero.body.velocity.x = this.hero.bounceSpeed;
+      }
     }
   }
 
@@ -148,7 +152,8 @@ class Stage extends Phaser.Scene {
       if (
         !this.hero.body.blocked.down &&
         !this.hero.doubleJumped &&
-        this.hero.heroEnergy > 0
+        this.hero.heroEnergy > 0 &&
+        this.hero.isAlive
       ) {
         this.hero.doubleJumped = true;
         this.hero.jumpLimit = this.hero.y - 100;

@@ -1,16 +1,13 @@
 import { fruitGroups, fruitPositions, monkeyPositions } from "../data/mapData";
 import Fruit from "./Fruit";
+import Hero from "./Hero";
 import Monkey from "./Monkey";
 
 class Map {
+  posUp = +1;
+  posDown = -1;
+  currentMap = 0;
   maps = [
-    "assets/tiles/map0.json",
-    "assets/tiles/map1.json",
-    "assets/tiles/map2.json",
-    "assets/tiles/map3.json",
-    "assets/tiles/map4.json",
-    "assets/tiles/map5.json",
-    "assets/tiles/map6.json",
     "assets/tiles/map0s.json",
     "assets/tiles/map1s.json",
     "assets/tiles/map2s.json",
@@ -18,6 +15,13 @@ class Map {
     "assets/tiles/map4s.json",
     "assets/tiles/map5s.json",
     "assets/tiles/map6s.json",
+    "assets/tiles/map0.json",
+    "assets/tiles/map1.json",
+    "assets/tiles/map2.json",
+    "assets/tiles/map3.json",
+    "assets/tiles/map4.json",
+    "assets/tiles/map5.json",
+    "assets/tiles/map6.json",
   ];
   scrollingMap = new Array(3);
   camera;
@@ -43,12 +47,13 @@ class Map {
       ]);
       if (this.scrollingMap[i].spikes !== null) {
         this.scrollingMap[i].spikes.setCollision([
-          61, 62, 21, 22, 23, 33, 34, 35, 45, 46, 47,
+          61, 62, 21, 22, 23, 33, 34, 35, 45, 46, 47, 56,
         ]);
       }
+      const actualMap = this.currentMap;
       scene.physics.add.collider(hero, this.scrollingMap[i].ground);
       scene.physics.add.collider(hero, this.scrollingMap[i].spikes, () => {
-        console.log("SPAIKUUU");
+        this.spikeCollision(hero, this.scrollingMap[i].spikes, actualMap);
       });
       if (monkeyGroup.length > 0) {
         monkeyGroup.forEach((monkey) => {
@@ -81,6 +86,100 @@ class Map {
         if (this.scrollingMap[i].spikes !== null)
           this.scrollingMap[i].spikes.x = 5120;
       }
+      this.currentMap++;
+    }
+  }
+
+  get32Divider(number) {
+    if (number % 32 === 0) {
+      return number / 32;
+    } else {
+      number++;
+      this.get32Divider(number);
+    }
+  }
+
+  spikeCollision(hero, tilemap, currentMap) {
+    if (!hero.isSpiked) {
+      const getRowAndColumn = () => {
+        const mapStartPos = currentMap * 2560;
+        const differenceBetweenHeroAndMap = Math.abs(
+          mapStartPos - Math.round(hero.x)
+        );
+
+        //FIND number
+        const row = this.get32Divider(differenceBetweenHeroAndMap);
+        const col = this.get32Divider(Math.round(hero.y + 64));
+        return [row, col, mapStartPos];
+        // hero.isSpiked = true;
+      };
+      const tilePosition = getRowAndColumn();
+      if (tilePosition[0] !== undefined && tilePosition[1] !== undefined) {
+        hero.body.setAllowGravity(false);
+        hero.isAlive = false;
+        hero.body.velocity.x = 0;
+        hero.body.velocity.y = 0;
+        if (
+          tilemap.layer.data[tilePosition[1]][tilePosition[0] + 1].index === -1
+        )
+          hero.spikedX = tilePosition[2] + 32 * tilePosition[0] - 32;
+        else hero.spikedX = tilePosition[2] + 32 * tilePosition[0];
+        hero.spikedY = tilePosition[1] * 32 - 32;
+        hero.isSpiked = true;
+        console.log(
+          tilePosition,
+          "TILE X POS",
+          tilePosition[2] + 32 * tilePosition[0],
+          "TILE Y POS",
+          tilePosition[1] * 32
+        );
+      }
+      // let tileXPos = this.getTilePosition(Math.round(hero.x));
+      // let tileYPos = this.getTilePosition(Math.round(hero.y + 32));
+      // // console.log(tileXPos, tileYPos);
+      // // console.log(tilemap);
+      // hero.body.setAllowGravity(false);
+      // hero.isAlive = false;
+      // hero.body.velocity.x = 0;
+      // hero.body.velocity.y = 0;
+      // hero.spikedX = tileXPos;
+      // hero.spikedY = tileYPos;
+
+      // // console.log(hero.x, hero.y);
+      // hero.isSpiked = true;
+    }
+
+    // if (!hero.isSpiked) hero.destPos = hero.body.y + 32;
+    // const mapPos = (this.currentMap - 3) * 2560;
+    // const heroPos = Math.round(hero.body.x);
+    // let tilePos = this.getTilePosition(Math.round(heroPos));
+    // hero.body.setAllowGravity(false);
+    // hero.isSpiked = true;
+    // hero.isAlive = false;
+    // hero.body.velocity.x = 0;
+    // hero.body.x = tilePos - 4;
+  }
+
+  getTilePosition(pos) {
+    if (pos % 32 === 0) {
+      return pos;
+    } else if ((pos + this.posDown) % 32 === 0) {
+      const result = pos + this.posDown;
+      this.posUp = 0;
+      this.posDown = 0;
+
+      return result;
+    } else if ((pos + this.posUp) % 32 === 0) {
+      const result = pos + this.posUp;
+      this.posUp = 0;
+      this.posDown = 0;
+
+      return result;
+    } else {
+      this.posUp++;
+      this.posDown--;
+
+      return this.getTilePosition(pos);
     }
   }
 
@@ -90,7 +189,7 @@ class Map {
 
   public shiftMaps(hero, monkeyGroup, scene) {
     // REMOVE FIRST INDEX WHEN PLAYER REACHES x 640
-    if (hero.x >= this.scrollingMap[0].ground.x + 1280)
+    if (hero.x >= this.scrollingMap[0].ground.x + 2560)
       this.scrollingMap.shift();
     // ADD IT TO THE END OF THE ARRAY
     if (this.scrollingMap.length < 3) {
@@ -115,7 +214,7 @@ class Map {
       ]);
       if (this.scrollingMap[2].spikes !== null) {
         this.scrollingMap[2].spikes.setCollision([
-          61, 62, 21, 22, 23, 33, 34, 35, 45, 46, 47,
+          61, 62, 21, 22, 23, 33, 34, 35, 45, 46, 47, 56,
         ]);
       }
 
@@ -127,11 +226,13 @@ class Map {
         this.scrollingMap[2].ground.x,
         monkeyGroup
       );
+      const actualMap = this.currentMap;
       scene.physics.add.collider(hero, this.scrollingMap[2].ground);
       if (this.scrollingMap[2].spikes !== null)
         scene.physics.add.collider(hero, this.scrollingMap[2].spikes, () => {
-          console.log("SPAIKUUU");
+          this.spikeCollision(hero, this.scrollingMap[2].spikes, actualMap);
         });
+      this.currentMap++;
     }
   }
 
