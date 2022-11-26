@@ -2,6 +2,7 @@ import FloatingText from "./FloatingText";
 import Steam from "./Steam";
 
 class Hero extends Phaser.Physics.Arcade.Sprite {
+  touchedSpikes = false;
   isAlive = true;
   isJumping = false;
   doubleJumped = false;
@@ -24,6 +25,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   destPos;
   spikedX = 0;
   spikedY = 0;
+  spikedXDir = 0;
 
   constructor(scene, x, y, sprite, heroSounds) {
     super(scene, x, y, sprite);
@@ -62,8 +64,6 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     if (this.heroEnergy > 100) this.heroEnergy = 100;
   }
 
-  checkSpiked() {}
-
   checkForCollision() {
     if (!this.isSpiked) {
       if (this.body.blocked.up) {
@@ -96,8 +96,15 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
         this.body.offset.y = 5;
       }
     } else {
-      this.x = this.spikedX;
-      this.y = this.spikedY;
+      if (this.spikedXDir === 1) {
+        if (this.x < this.spikedX) this.x += 1;
+        else this.x = this.spikedX;
+      } else if (this.spikedXDir === -1) {
+        if (this.x > this.spikedX) this.x -= 2;
+        else this.x = this.spikedX;
+      }
+      if (this.y < this.spikedY) this.y += 3;
+      else this.y = this.spikedY;
     }
   }
 
@@ -162,7 +169,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     this.createAnimation("crash-land", 55, 59, 25, 0);
     this.createAnimation("double-jump", 60, 68, 80, 0);
     this.createAnimation("double-jump-fall", 70, 72, 25, 0);
-    this.createAnimation("pinched", 72, 77, 25, 0);
+    this.createAnimation("pinched", 72, 79, 25, 0);
   }
 
   createAnimation(
@@ -254,7 +261,8 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
       else if (
         this.body.blocked.down &&
         this.anims.currentAnim.key !== "run" &&
-        this.anims.currentAnim.key !== "land"
+        this.anims.currentAnim.key !== "land" &&
+        !this.isSpiked
       )
         this.play("land");
       else if (

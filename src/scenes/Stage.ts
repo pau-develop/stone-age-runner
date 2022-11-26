@@ -97,14 +97,12 @@ class Stage extends Phaser.Scene {
   }
 
   update() {
-    console.log(this.hero.x, this.hero.y);
     this.meters = Math.round(this.cameras.main.scrollX / 64);
     this.ui.displayDistance(this.meters);
     this.ui.displayScore(this.hero.score);
     this.ui.getFPS(this.game);
     this.ui.controlBar(this.hero.heroEnergy);
     this.hero.checkForCollision();
-    this.hero.checkSpiked();
     if (this.monkeyGroup.length > 0) {
       this.monkeyGroup.forEach((monkey) => {
         monkey.checkForCollision();
@@ -163,7 +161,7 @@ class Stage extends Phaser.Scene {
       }
     });
     //HOLD
-    if (this.jump.isDown && this.hero.isJumping) {
+    if (this.jump.isDown && this.hero.isJumping && !this.hero.isSpiked) {
       if (!this.hero.doubleJumped) {
         if (this.hero.y > this.hero.jumpLimit) {
           this.hero.body.velocity.y = this.hero.jumpForce;

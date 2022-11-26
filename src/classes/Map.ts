@@ -4,8 +4,6 @@ import Hero from "./Hero";
 import Monkey from "./Monkey";
 
 class Map {
-  posUp = +1;
-  posDown = -1;
   currentMap = 0;
   maps = [
     "assets/tiles/map0s.json",
@@ -90,96 +88,49 @@ class Map {
     }
   }
 
-  get32Divider(number) {
+  getMultiple(number) {
     if (number % 32 === 0) {
       return number / 32;
     } else {
       number++;
-      this.get32Divider(number);
+      return this.getMultiple(number);
     }
   }
+
+  getRowAndColumn = (hero, currentMap) => {
+    const mapStartPos = currentMap * 2560;
+    const differenceBetweenHeroAndMap = Math.abs(
+      mapStartPos - Math.round(hero.x)
+    );
+    //FIND number
+    const col = this.getMultiple(Math.round(hero.y + 22));
+    const row = this.getMultiple(differenceBetweenHeroAndMap);
+    console.log(row);
+    return [row, col, mapStartPos];
+  };
 
   spikeCollision(hero, tilemap, currentMap) {
     if (!hero.isSpiked) {
-      const getRowAndColumn = () => {
-        const mapStartPos = currentMap * 2560;
-        const differenceBetweenHeroAndMap = Math.abs(
-          mapStartPos - Math.round(hero.x)
-        );
-
-        //FIND number
-        const row = this.get32Divider(differenceBetweenHeroAndMap);
-        const col = this.get32Divider(Math.round(hero.y + 64));
-        return [row, col, mapStartPos];
-        // hero.isSpiked = true;
-      };
-      const tilePosition = getRowAndColumn();
+      hero.body.velocity.x = 0;
+      hero.body.velocity.y = 0;
+      this.camera.stopFollow();
+      hero.body.setAllowGravity(false);
+      hero.isSpiked = true;
+      hero.isAlive = false;
+      const tilePosition = this.getRowAndColumn(hero, currentMap);
       if (tilePosition[0] !== undefined && tilePosition[1] !== undefined) {
-        hero.body.setAllowGravity(false);
-        hero.isAlive = false;
-        hero.body.velocity.x = 0;
-        hero.body.velocity.y = 0;
         if (
-          tilemap.layer.data[tilePosition[1]][tilePosition[0] + 1].index === -1
-        )
+          tilemap.layer.data[tilePosition[1] + 1][tilePosition[0] + 1].index ===
+          -1
+        ) {
+          console.log("hola");
           hero.spikedX = tilePosition[2] + 32 * tilePosition[0] - 32;
-        else hero.spikedX = tilePosition[2] + 32 * tilePosition[0];
-        hero.spikedY = tilePosition[1] * 32 - 32;
-        hero.isSpiked = true;
-        console.log(
-          tilePosition,
-          "TILE X POS",
-          tilePosition[2] + 32 * tilePosition[0],
-          "TILE Y POS",
-          tilePosition[1] * 32
-        );
+        } else hero.spikedX = tilePosition[2] + 32 * tilePosition[0];
+
+        hero.spikedY = (tilePosition[1] - 1) * 32;
+        if (hero.spikedX > hero.x) hero.spikedXDir = 1;
+        else if (hero.spikedX < hero.x) hero.spikedXDir = -1;
       }
-      // let tileXPos = this.getTilePosition(Math.round(hero.x));
-      // let tileYPos = this.getTilePosition(Math.round(hero.y + 32));
-      // // console.log(tileXPos, tileYPos);
-      // // console.log(tilemap);
-      // hero.body.setAllowGravity(false);
-      // hero.isAlive = false;
-      // hero.body.velocity.x = 0;
-      // hero.body.velocity.y = 0;
-      // hero.spikedX = tileXPos;
-      // hero.spikedY = tileYPos;
-
-      // // console.log(hero.x, hero.y);
-      // hero.isSpiked = true;
-    }
-
-    // if (!hero.isSpiked) hero.destPos = hero.body.y + 32;
-    // const mapPos = (this.currentMap - 3) * 2560;
-    // const heroPos = Math.round(hero.body.x);
-    // let tilePos = this.getTilePosition(Math.round(heroPos));
-    // hero.body.setAllowGravity(false);
-    // hero.isSpiked = true;
-    // hero.isAlive = false;
-    // hero.body.velocity.x = 0;
-    // hero.body.x = tilePos - 4;
-  }
-
-  getTilePosition(pos) {
-    if (pos % 32 === 0) {
-      return pos;
-    } else if ((pos + this.posDown) % 32 === 0) {
-      const result = pos + this.posDown;
-      this.posUp = 0;
-      this.posDown = 0;
-
-      return result;
-    } else if ((pos + this.posUp) % 32 === 0) {
-      const result = pos + this.posUp;
-      this.posUp = 0;
-      this.posDown = 0;
-
-      return result;
-    } else {
-      this.posUp++;
-      this.posDown--;
-
-      return this.getTilePosition(pos);
     }
   }
 
