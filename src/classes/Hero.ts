@@ -2,6 +2,7 @@ import FloatingText from "./FloatingText";
 import Steam from "./Steam";
 
 class Hero extends Phaser.Physics.Arcade.Sprite {
+  touchedSpikes = false;
   isAlive = true;
   isJumping = false;
   doubleJumped = false;
@@ -11,13 +12,23 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   justCrashed = false;
   bounceSpeed = -50;
   heroSpeed = 250;
-  heroEnergy = 0;
+  heroEnergy = 100;
   isRecovering = false;
   isConsuming = false;
   score = 0;
   counter = 5;
+  spikeCounter = 0;
   isCrashed = false;
   heroSounds = new Array();
+  checkBlocked = false;
+  isSpiked = false;
+  isSpikedTop = false;
+  destPos;
+  spikedX = 0;
+  spikedY = 0;
+  spikedXDir = 0;
+  colliderX = 20;
+  colliderY = 54;
 
   constructor(scene, x, y, sprite, heroSounds) {
     super(scene, x, y, sprite);
@@ -25,6 +36,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     this.scene.add.existing(this);
     this.scene.physics.world.enable(this);
     this.setOrigin(0, 0);
+    this.setDepth(50);
     this.init();
     this.createAnimations();
     this.play("run");
@@ -33,7 +45,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
 
   init() {
     this.isAlive = true;
-    this.body.setSize(32, 54);
+    this.body.setSize(this.colliderX, this.colliderY);
     this.body.offset.y = 10;
   }
 
@@ -56,20 +68,46 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   }
 
   checkForCollision() {
-    if (this.body.blocked.right) {
-      this.isAlive = false;
-    }
-    if (this.body.blocked.down) {
-      this.counter = 5;
-      this.isJumping = false;
-      this.doubleJumped = false;
-      this.jumpForce = -200;
-      this.body.setSize(32, 54);
-      this.body.offset.y = 10;
-      if (this.isAlive) this.fillEnergyBar();
+    if (!this.isSpiked) {
+      if (this.body.blocked.up) {
+        this.body.y = this.body.y + 2;
+        this.isJumping = false;
+        this.body.velocity.y = +20;
+        return;
+      }
+      if (this.body.blocked.right) {
+        if (!this.checkBlocked) {
+          this.body.y = this.body.y + 2;
+          this.checkBlocked = true;
+          return;
+        } else {
+          if (!this.body.blocked.up) this.isAlive = false;
+        }
+      }
+
+      if (this.body.blocked.down) {
+        this.checkBlocked = false;
+        this.counter = 5;
+        this.isJumping = false;
+        this.doubleJumped = false;
+        this.jumpForce = -200;
+        this.body.setSize(this.colliderX, this.colliderY);
+        this.body.offset.y = 10;
+        if (this.isAlive) this.fillEnergyBar();
+      } else {
+        this.body.setSize(this.colliderX, this.colliderY);
+        this.body.offset.y = 5;
+      }
     } else {
-      this.body.setSize(32, 54);
-      this.body.offset.y = 5;
+      if (this.spikedXDir === 1) {
+        if (this.x < this.spikedX) this.x += 1;
+        else this.x = this.spikedX;
+      } else if (this.spikedXDir === -1) {
+        if (this.x > this.spikedX) this.x -= 2;
+        else this.x = this.spikedX;
+      }
+      if (this.y < this.spikedY) this.y += 3;
+      else this.y = this.spikedY;
     }
   }
 
@@ -134,6 +172,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     this.createAnimation("crash-land", 55, 59, 25, 0);
     this.createAnimation("double-jump", 60, 68, 80, 0);
     this.createAnimation("double-jump-fall", 70, 72, 25, 0);
+    this.createAnimation("pinched", 72, 79, 25, 0);
   }
 
   createAnimation(
@@ -155,7 +194,6 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   }
 
   playSounds() {
-    //STEP
     if (this.anims.currentAnim.key === "run") {
       if (this.anims.currentFrame.index === 3) {
         this.heroSounds[0].play();
@@ -171,8 +209,11 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     else if (
       this.anims.currentAnim.key === "crash" &&
       this.anims.currentFrame.index === 1
-    )
-      this.heroSounds[1].play();
+    ) {
+      if (this.isSpiked) this.heroSounds[5].play();
+      else this.heroSounds[1].play();
+    }
+
     //JUMP
     else if (this.anims.currentAnim.key === "jump") {
       if (this.body.velocity.y < 0 && this.anims.currentFrame.index === 1)
@@ -187,10 +228,13 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
       this.anims.currentFrame.index === 2
     ) {
       this.heroSounds[4].play();
-    } else if (this.anims.currentAnim.key === "double-jump-fall") {
-      console.log("DISH!");
+    } else if (this.anims.currentAnim.key === "fall") {
       this.heroSounds[4].stop();
     }
+  }
+
+  playSound(sound) {
+    this.heroSounds[sound].play();
   }
 
   playAnimations() {
@@ -213,8 +257,8 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
       else if (
         !this.body.blocked.down &&
         this.body.velocity.y > 0 &&
-        this.anims.currentAnim.key !== "fall" &&
-        this.anims.currentAnim.key === "jump"
+        this.anims.currentAnim.key !== "fall"
+        // this.anims.currentAnim.key === "jump"
       )
         this.play("fall");
       else if (
@@ -227,7 +271,8 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
       else if (
         this.body.blocked.down &&
         this.anims.currentAnim.key !== "run" &&
-        this.anims.currentAnim.key !== "land"
+        this.anims.currentAnim.key !== "land" &&
+        !this.isSpiked
       )
         this.play("land");
       else if (
@@ -239,10 +284,19 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
       }
     } else {
       if (
-        (this.body.blocked.right && this.anims.currentAnim.key !== "crash") ||
+        (this.isSpiked || this.isSpikedTop) &&
+        this.anims.currentAnim.key !== "pinched"
+      ) {
+        this.play("pinched");
+      }
+      if (
+        (this.body.blocked.right &&
+          this.anims.currentAnim.key !== "crash" &&
+          !this.isSpiked) ||
         (this.isCrashed &&
           this.body.touching.right &&
-          this.anims.currentAnim.key !== "crash")
+          this.anims.currentAnim.key !== "crash" &&
+          !this.isSpiked)
       ) {
         this.play("crash");
       } else if (

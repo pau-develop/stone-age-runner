@@ -11,6 +11,7 @@ class Monkey extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, sprite);
     this.scene = scene;
     this.monkey = this.scene.add.existing(this);
+    this.monkey.setDepth(50);
     this.scene.physics.world.enable(this);
     this.setOrigin(0, 0);
     hero.setColliders(this.monkey);

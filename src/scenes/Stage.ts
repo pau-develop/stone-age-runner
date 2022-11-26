@@ -9,6 +9,8 @@ class Stage extends Phaser.Scene {
   monkey;
   hero;
   jump;
+  accelerate;
+  break;
   map;
   background;
   ui;
@@ -29,6 +31,7 @@ class Stage extends Phaser.Scene {
     this.load.audio("jump", "assets/fx/JUMP2LLARG.wav");
     this.load.audio("track", "assets/music/TRACK.wav");
     this.load.audio("double-jump", "assets/fx/FART2.wav");
+    this.load.audio("spikes", "assets/fx/SPIKES.wav");
 
     this.monkeyGroup = new Array(0);
     this.load.spritesheet("monkey", "assets/monkey/monkey.png", {
@@ -66,20 +69,20 @@ class Stage extends Phaser.Scene {
     this.heroSounds.push(this.sound.add("eat", { loop: false, volume: 0.2 }));
     this.heroSounds.push(this.sound.add("jump", { loop: false }));
     this.heroSounds.push(this.sound.add("double-jump", { loop: true }));
+    this.heroSounds.push(this.sound.add("spikes", { loop: false })); //5
     this.map.getSound(this.heroSounds[2]);
     this.music = this.sound.add("track", { loop: true });
-    this.music.play();
+    // this.music.play();
 
     this.ui = new Ui(this, this.game);
     this.hero = new Hero(this, 64, 100, "hero", this.heroSounds);
-    this.monkeyGroup.push(
-      new Monkey(this, 600, 100, "monkey", this.hero, this.map)
+
+    this.jump = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
+    this.accelerate = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.RIGHT
     );
-    this.monkeyGroup.push(
-      new Monkey(this, 728, 100, "monkey", this.hero, this.map)
-    );
-    this.jump = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.SPACE
+    this.break = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.LEFT
     );
     this.map.instantiateMap(this.hero, this.monkeyGroup, this);
     this.background = this.add.image(0, 0, "background");
@@ -119,9 +122,11 @@ class Stage extends Phaser.Scene {
         this.hero.body.velocity.y = 0;
         this.hero.justCrashed = true;
       }
-      if (this.hero.bounceSpeed < 0) this.hero.bounceSpeed += 1;
-      else this.hero.bounceSpeed = 0;
-      this.hero.body.velocity.x = this.hero.bounceSpeed;
+      if (!this.hero.isSpiked && !this.hero.isSpikedTop) {
+        if (this.hero.bounceSpeed < 0) this.hero.bounceSpeed += 1;
+        else this.hero.bounceSpeed = 0;
+        this.hero.body.velocity.x = this.hero.bounceSpeed;
+      }
     }
   }
 
@@ -130,51 +135,55 @@ class Stage extends Phaser.Scene {
       (monkey) => !monkey.canBeRemoved
     );
   }
+  manageJump() {
+    //TAP
+    this.jump.on("down", () => {
+      if (this.hero.body.blocked.down && this.hero.isAlive) {
+        this.hero.jumpLimit = this.hero.y - 100;
+        this.hero.body.velocity.y = this.hero.jumpForce;
+        this.hero.isJumping = true;
+        return;
+      }
+      if (
+        !this.hero.body.blocked.down &&
+        !this.hero.doubleJumped &&
+        this.hero.heroEnergy > 0 &&
+        this.hero.isAlive
+      ) {
+        this.hero.doubleJumped = true;
+        this.hero.jumpLimit = this.hero.y - 100;
+        this.hero.jumpForce = -200;
+        this.hero.body.velocity.y = this.hero.jumpForce;
+        this.hero.isJumping = true;
+      }
+    });
+    //HOLD
+    if (this.jump.isDown && this.hero.isJumping && !this.hero.isSpiked) {
+      if (!this.hero.doubleJumped) {
+        if (this.hero.y > this.hero.jumpLimit) {
+          this.hero.body.velocity.y = this.hero.jumpForce;
+          this.hero.jumpForce += 2;
+        } else {
+          this.hero.isJumping = false;
+        }
+      } else if (this.hero.doubleJumped) {
+        if (this.hero.heroEnergy > 0) {
+          this.hero.body.velocity.y = this.hero.jumpForce;
+          this.hero.consumeEnergyBar();
+          this.hero.emitSteam();
+        } else if (this.hero.heroEnergy <= 0) this.hero.isJumping = false;
+      }
+    }
+    //RELEASE
+    this.jump.on("up", () => {
+      this.hero.isJumping = false;
+      this.hero.doubleJumped = false;
+    });
+  }
 
   getInput() {
     if (this.hero.isAlive) {
-      //TAP
-      this.jump.on("down", () => {
-        if (this.hero.body.blocked.down && this.hero.isAlive) {
-          this.hero.jumpLimit = this.hero.y - 100;
-          this.hero.body.velocity.y = this.hero.jumpForce;
-          this.hero.isJumping = true;
-          return;
-        }
-        if (
-          !this.hero.body.blocked.down &&
-          !this.hero.doubleJumped &&
-          this.hero.heroEnergy > 0
-        ) {
-          this.hero.doubleJumped = true;
-          this.hero.jumpLimit = this.hero.y - 100;
-          this.hero.jumpForce = -200;
-          this.hero.body.velocity.y = this.hero.jumpForce;
-          this.hero.isJumping = true;
-        }
-      });
-      //HOLD
-      if (this.jump.isDown && this.hero.isJumping) {
-        if (!this.hero.doubleJumped) {
-          if (this.hero.y > this.hero.jumpLimit) {
-            this.hero.body.velocity.y = this.hero.jumpForce;
-            this.hero.jumpForce += 2;
-          } else {
-            this.hero.isJumping = false;
-          }
-        } else if (this.hero.doubleJumped) {
-          if (this.hero.heroEnergy > 0) {
-            this.hero.body.velocity.y = this.hero.jumpForce;
-            this.hero.consumeEnergyBar();
-            this.hero.emitSteam();
-          } else if (this.hero.heroEnergy <= 0) this.hero.isJumping = false;
-        }
-      }
-      //RELEASE
-      this.jump.on("up", () => {
-        this.hero.isJumping = false;
-        this.hero.doubleJumped = false;
-      });
+      this.manageJump();
     }
     //UI CONTROLS
     else {
