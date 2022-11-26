@@ -31,6 +31,7 @@ class Stage extends Phaser.Scene {
     this.load.audio("jump", "assets/fx/JUMP2LLARG.wav");
     this.load.audio("track", "assets/music/TRACK.wav");
     this.load.audio("double-jump", "assets/fx/FART2.wav");
+    this.load.audio("spikes", "assets/fx/SPIKES.wav");
 
     this.monkeyGroup = new Array(0);
     this.load.spritesheet("monkey", "assets/monkey/monkey.png", {
@@ -68,18 +69,14 @@ class Stage extends Phaser.Scene {
     this.heroSounds.push(this.sound.add("eat", { loop: false, volume: 0.2 }));
     this.heroSounds.push(this.sound.add("jump", { loop: false }));
     this.heroSounds.push(this.sound.add("double-jump", { loop: true }));
+    this.heroSounds.push(this.sound.add("spikes", { loop: false })); //5
     this.map.getSound(this.heroSounds[2]);
     this.music = this.sound.add("track", { loop: true });
     // this.music.play();
 
     this.ui = new Ui(this, this.game);
     this.hero = new Hero(this, 64, 100, "hero", this.heroSounds);
-    // this.monkeyGroup.push(
-    //   new Monkey(this, 664, 100, "monkey", this.hero, this.map)
-    // );
-    // this.monkeyGroup.push(
-    //   new Monkey(this, 792, 100, "monkey", this.hero, this.map)
-    // );
+
     this.jump = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
     this.accelerate = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.RIGHT
@@ -125,7 +122,7 @@ class Stage extends Phaser.Scene {
         this.hero.body.velocity.y = 0;
         this.hero.justCrashed = true;
       }
-      if (!this.hero.isSpiked) {
+      if (!this.hero.isSpiked && !this.hero.isSpikedTop) {
         if (this.hero.bounceSpeed < 0) this.hero.bounceSpeed += 1;
         else this.hero.bounceSpeed = 0;
         this.hero.body.velocity.x = this.hero.bounceSpeed;

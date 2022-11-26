@@ -6,12 +6,15 @@ import Monkey from "./Monkey";
 class Map {
   currentMap = 0;
   maps = [
+    "assets/tiles/map5s2.json",
+    "assets/tiles/map5s2.json",
+    "assets/tiles/map5s2.json",
     "assets/tiles/map0s.json",
+    "assets/tiles/map5s.json",
+    "assets/tiles/map5s.json",
     "assets/tiles/map1s.json",
     "assets/tiles/map2s.json",
-    "assets/tiles/map3s.json",
     "assets/tiles/map4s.json",
-    "assets/tiles/map5s.json",
     "assets/tiles/map6s.json",
     "assets/tiles/map0.json",
     "assets/tiles/map1.json",
@@ -105,12 +108,25 @@ class Map {
     //FIND number
     const col = this.getMultiple(Math.round(hero.y + 22));
     const row = this.getMultiple(differenceBetweenHeroAndMap);
-    console.log(row);
     return [row, col, mapStartPos];
   };
 
   spikeCollision(hero, tilemap, currentMap) {
     if (!hero.isSpiked) {
+      if (hero.body.blocked.right) {
+        hero.playSound(5);
+        return;
+      }
+      if (hero.body.blocked.up) {
+        hero.body.velocity.x = 0;
+        hero.body.velocity.y = 0;
+        hero.isAlive = false;
+        hero.isSpikedTop = true;
+        hero.playSound(5);
+        return;
+      }
+      console.log("running");
+      hero.playSound(5);
       hero.body.velocity.x = 0;
       hero.body.velocity.y = 0;
       this.camera.stopFollow();
@@ -118,12 +134,12 @@ class Map {
       hero.isSpiked = true;
       hero.isAlive = false;
       const tilePosition = this.getRowAndColumn(hero, currentMap);
+      console.log(tilePosition);
       if (tilePosition[0] !== undefined && tilePosition[1] !== undefined) {
         if (
           tilemap.layer.data[tilePosition[1] + 1][tilePosition[0] + 1].index ===
           -1
         ) {
-          console.log("hola");
           hero.spikedX = tilePosition[2] + 32 * tilePosition[0] - 32;
         } else hero.spikedX = tilePosition[2] + 32 * tilePosition[0];
 

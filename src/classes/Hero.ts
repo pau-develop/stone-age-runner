@@ -12,7 +12,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   justCrashed = false;
   bounceSpeed = -50;
   heroSpeed = 250;
-  heroEnergy = 0;
+  heroEnergy = 100;
   isRecovering = false;
   isConsuming = false;
   score = 0;
@@ -22,10 +22,13 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   heroSounds = new Array();
   checkBlocked = false;
   isSpiked = false;
+  isSpikedTop = false;
   destPos;
   spikedX = 0;
   spikedY = 0;
   spikedXDir = 0;
+  colliderX = 20;
+  colliderY = 54;
 
   constructor(scene, x, y, sprite, heroSounds) {
     super(scene, x, y, sprite);
@@ -42,7 +45,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
 
   init() {
     this.isAlive = true;
-    this.body.setSize(32, 54);
+    this.body.setSize(this.colliderX, this.colliderY);
     this.body.offset.y = 10;
   }
 
@@ -88,11 +91,11 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
         this.isJumping = false;
         this.doubleJumped = false;
         this.jumpForce = -200;
-        this.body.setSize(32, 54);
+        this.body.setSize(this.colliderX, this.colliderY);
         this.body.offset.y = 10;
         if (this.isAlive) this.fillEnergyBar();
       } else {
-        this.body.setSize(32, 54);
+        this.body.setSize(this.colliderX, this.colliderY);
         this.body.offset.y = 5;
       }
     } else {
@@ -206,8 +209,11 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     else if (
       this.anims.currentAnim.key === "crash" &&
       this.anims.currentFrame.index === 1
-    )
-      this.heroSounds[1].play();
+    ) {
+      if (this.isSpiked) this.heroSounds[5].play();
+      else this.heroSounds[1].play();
+    }
+
     //JUMP
     else if (this.anims.currentAnim.key === "jump") {
       if (this.body.velocity.y < 0 && this.anims.currentFrame.index === 1)
@@ -225,6 +231,10 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     } else if (this.anims.currentAnim.key === "fall") {
       this.heroSounds[4].stop();
     }
+  }
+
+  playSound(sound) {
+    this.heroSounds[sound].play();
   }
 
   playAnimations() {
@@ -273,7 +283,10 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
         this.play("run");
       }
     } else {
-      if (this.isSpiked && this.anims.currentAnim.key !== "pinched") {
+      if (
+        (this.isSpiked || this.isSpikedTop) &&
+        this.anims.currentAnim.key !== "pinched"
+      ) {
         this.play("pinched");
       }
       if (
