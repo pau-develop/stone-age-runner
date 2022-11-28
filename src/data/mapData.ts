@@ -1,3 +1,37 @@
+export const maps = [
+  "assets/tiles/map0.json",
+  "assets/tiles/map1.json",
+  "assets/tiles/map2.json",
+  "assets/tiles/map0s.json",
+  "assets/tiles/map1s.json",
+  "assets/tiles/map1s2.json",
+  "assets/tiles/map2s.json",
+  "assets/tiles/map3.json",
+  "assets/tiles/map4.json",
+  "assets/tiles/map4s.json",
+  "assets/tiles/map5.json",
+  "assets/tiles/map5s.json",
+  "assets/tiles/map5s2.json",
+  "assets/tiles/map5s3.json",
+  "assets/tiles/map5s4.json",
+  "assets/tiles/map5s5.json",
+  "assets/tiles/map5s6.json",
+  "assets/tiles/map6.json",
+  "assets/tiles/map6s.json",
+  "assets/tiles/map7.json",
+  "assets/tiles/map7s.json",
+  "assets/tiles/map8.json",
+  "assets/tiles/map8s.json",
+];
+
+export const collisionTilesGround = [
+  7, 8, 12, 13, 14, 16, 17, 18, 26, 28, 29, 30, 34, 37, 40, 41, 42, 51,
+];
+
+export const collisionTilesSpikes = [
+  61, 62, 21, 22, 23, 33, 34, 35, 45, 46, 47, 56,
+];
+
 export const fruitGroups = {
   linePositions: [
     { x: 0, y: 0 },

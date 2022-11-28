@@ -1,44 +1,17 @@
-import { fruitGroups, fruitPositions, monkeyPositions } from "../data/mapData";
+import {
+  collisionTilesGround,
+  collisionTilesSpikes,
+  fruitPositions,
+  maps,
+  monkeyPositions,
+} from "../data/mapData";
 import Fruit from "./Fruit";
 import Hero from "./Hero";
 import Monkey from "./Monkey";
 
 class Map {
   currentMap = 0;
-  maps = [
-    "assets/tiles/map8.json",
-    "assets/tiles/map8s.json",
-    "assets/tiles/map8s.json",
-    "assets/tiles/map8.json",
-    "assets/tiles/map7s.json",
-    "assets/tiles/map7.json",
-    "assets/tiles/map5s6.json",
-    "assets/tiles/map5s5.json",
-    "assets/tiles/map5s4.json",
-    "assets/tiles/map5s4.json",
-    "assets/tiles/map5s4.json",
-    "assets/tiles/map1s2.json",
-    "assets/tiles/map6s.json",
-    "assets/tiles/map6s.json",
-    "assets/tiles/map6s.json",
-    "assets/tiles/map5s2.json",
-    "assets/tiles/map5s3.json",
-    "assets/tiles/map5s2.json",
-    "assets/tiles/map5s2.json",
-    "assets/tiles/map0s.json",
-    "assets/tiles/map5s.json",
-    "assets/tiles/map5s.json",
-    "assets/tiles/map1s.json",
-    "assets/tiles/map2s.json",
-    "assets/tiles/map4s.json",
-    "assets/tiles/map0.json",
-    "assets/tiles/map1.json",
-    "assets/tiles/map2.json",
-    "assets/tiles/map3.json",
-    "assets/tiles/map4.json",
-    "assets/tiles/map5.json",
-    "assets/tiles/map6.json",
-  ];
+  maps = maps;
   scrollingMap = new Array(3);
   camera;
   scene;
@@ -57,13 +30,9 @@ class Map {
         spikes: map.createLayer("spikes", map.addTilesetImage("wild", "tiles")),
       };
 
-      this.scrollingMap[i].ground.setCollision([
-        7, 8, 12, 13, 14, 16, 17, 18, 26, 28, 29, 30, 34, 37, 40, 41, 42, 51,
-      ]);
+      this.scrollingMap[i].ground.setCollision(collisionTilesGround);
       if (this.scrollingMap[i].spikes !== null) {
-        this.scrollingMap[i].spikes.setCollision([
-          61, 62, 21, 22, 23, 33, 34, 35, 45, 46, 47, 56,
-        ]);
+        this.scrollingMap[i].spikes.setCollision(collisionTilesSpikes);
       }
       const actualMap = this.currentMap;
       scene.physics.add.collider(hero, this.scrollingMap[i].ground);
@@ -189,23 +158,19 @@ class Map {
         front: map.createLayer("front", map.addTilesetImage("wild", "tiles")),
         spikes: map.createLayer("spikes", map.addTilesetImage("wild", "tiles")),
       });
+      console.log(this.scrollingMap[2]);
       this.scrollingMap[2].ground.x = this.scrollingMap[1].ground.x + 2560;
-
+      this.scrollingMap[2].ground.setCollision(collisionTilesGround);
       this.scrollingMap[2].back.x = this.scrollingMap[1].ground.x + 2560;
       if (this.scrollingMap[2].front !== null)
         this.scrollingMap[2].front.x = this.scrollingMap[1].ground.x + 2560;
-      if (this.scrollingMap[2].spikes !== null)
-        this.scrollingMap[2].spikes.x = this.scrollingMap[1].ground.x + 2560;
-      this.scrollingMap[2].ground.setCollision([
-        7, 8, 12, 13, 14, 16, 17, 18, 26, 28, 29, 30, 34, 37, 40, 41, 42, 51,
-      ]);
       if (this.scrollingMap[2].spikes !== null) {
-        this.scrollingMap[2].spikes.setCollision([
-          61, 62, 21, 22, 23, 33, 34, 35, 45, 46, 47, 56,
-        ]);
+        this.scrollingMap[2].spikes.x = this.scrollingMap[1].ground.x + 2560;
+        this.scrollingMap[2].spikes.setCollision(collisionTilesSpikes);
       }
 
       this.addCollectibles(hero, scene, randomMap, this.scrollingMap[2]);
+
       this.addMonkeys(
         scene,
         hero,
