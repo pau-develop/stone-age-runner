@@ -56,8 +56,7 @@ class Map {
         front: map.createLayer("front", map.addTilesetImage("wild", "tiles")),
         spikes: map.createLayer("spikes", map.addTilesetImage("wild", "tiles")),
       };
-      //NO 1,2,3,4,5,6,9,10,11,14,15,18
-      //SI 7,8,12,13,16,17
+
       this.scrollingMap[i].ground.setCollision([
         7, 8, 12, 13, 14, 16, 17, 18, 26, 28, 29, 30, 34, 37, 40, 41, 42, 51,
       ]);
@@ -77,7 +76,7 @@ class Map {
           scene.physics.add.collider(monkey, this.scrollingMap[i].spikes);
         });
       }
-      // debugger;
+
       if (i === 0) {
         this.scrollingMap[i].ground.x = 0;
         this.scrollingMap[i].back.x = 0;
@@ -129,9 +128,8 @@ class Map {
 
   spikeCollision(hero, tilemap, currentMap) {
     if (!hero.isSpiked) {
+      hero.playSound(5);
       if (hero.body.blocked.right) {
-        hero.playSound(5);
-        console.log("checking spike right");
         return;
       }
       if (hero.body.blocked.up) {
@@ -139,7 +137,6 @@ class Map {
         hero.body.velocity.y = 0;
         hero.isAlive = false;
         hero.isSpikedTop = true;
-        hero.playSound(5);
         return;
       }
       hero.isSpiked = true;
@@ -153,15 +150,12 @@ class Map {
       const tilePosition = this.getRowAndColumn(hero, currentMap);
 
       if (tilePosition[0] !== undefined && tilePosition[1] !== undefined) {
-        console.log(tilePosition);
-
         if (
           tilemap.layer.data[tilePosition[1] + 1][tilePosition[0] + 1] !==
             null &&
           tilemap.layer.data[tilePosition[1] + 1][tilePosition[0] + 1] !==
             undefined
         ) {
-          console.log(tilemap.layer);
           if (
             tilemap.layer.data[tilePosition[1] + 1][tilePosition[0] + 1]
               .index === -1
@@ -169,9 +163,7 @@ class Map {
             hero.spikedX = tilePosition[2] + 32 * tilePosition[0] - 32;
           else hero.spikedX = tilePosition[2] + 32 * tilePosition[0];
         }
-        console.log(tilePosition);
         hero.spikedY = (tilePosition[1] - 1) * 32;
-        console.log("SPIKEDXY", hero.spikedY, hero.spikedX);
         if (hero.spikedX > hero.x) hero.spikedXDir = 1;
         else if (hero.spikedX < hero.x) hero.spikedXDir = -1;
       }
@@ -183,7 +175,7 @@ class Map {
   }
 
   public shiftMaps(hero, monkeyGroup, scene) {
-    // REMOVE FIRST INDEX WHEN PLAYER REACHES x 640
+    // REMOVE FIRST INDEX WHEN PLAYER REACHES x 2560
     if (hero.x >= this.scrollingMap[0].ground.x + 2560)
       this.scrollingMap.shift();
     // ADD IT TO THE END OF THE ARRAY
@@ -233,40 +225,38 @@ class Map {
 
   addCollectibles(hero, scene, mapNumber, mapPosition) {
     if (mapNumber <= fruitPositions.length - 1) {
-      this.spawnFruits(
-        hero,
-        scene,
-        fruitPositions[mapNumber].x,
-        fruitPositions[mapNumber].y,
-        mapPosition,
-        fruitPositions[mapNumber].type
-      );
+      fruitPositions[mapNumber].forEach((element) => {
+        this.spawnFruits(
+          hero,
+          scene,
+          element.x,
+          element.y,
+          mapPosition,
+          element.type
+        );
+      });
     }
   }
 
   addMonkeys(scene, hero, mapNumber, mapPosition, monkeyGroup) {
     if (mapNumber <= monkeyPositions.length - 1) {
-      monkeyGroup.push(
-        new Monkey(
-          scene,
-          mapPosition + monkeyPositions[mapNumber].x,
-          monkeyPositions[mapNumber].y,
-          "monkey",
-          hero,
-          this
-        )
-      );
+      monkeyPositions[mapNumber].forEach((element) => {
+        monkeyGroup.push(
+          new Monkey(
+            scene,
+            mapPosition + element.x,
+            element.y,
+            "monkey",
+            hero,
+            this
+          )
+        );
+      });
       monkeyGroup.forEach((monkey) => {
-        scene.physics.add.collider(monkey, this.scrollingMap[0].ground);
-        scene.physics.add.collider(monkey, this.scrollingMap[1].ground);
-        scene.physics.add.collider(monkey, this.scrollingMap[2].ground);
-
-        if (this.scrollingMap[0].spikes !== null)
-          scene.physics.add.collider(monkey, this.scrollingMap[0].spikes);
-        if (this.scrollingMap[1].spikes !== null)
-          scene.physics.add.collider(monkey, this.scrollingMap[1].spikes);
-        if (this.scrollingMap[2].spikes !== null)
-          scene.physics.add.collider(monkey, this.scrollingMap[2].spikes);
+        this.scrollingMap.forEach((map) => {
+          scene.physics.add.collider(monkey, map.ground);
+          map.spikes !== null && scene.physics.add.collider(monkey, map.spikes);
+        });
       });
     }
   }

@@ -29,7 +29,6 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
     });
     this.setFruitProperties(currentFruit);
     this.fruit.body.setMass(0.5);
-    this.fruit.body.mass;
     this.yInitialPos = y;
     this.direction = direction;
     this.topOffset = this.yInitialPos + 5;
