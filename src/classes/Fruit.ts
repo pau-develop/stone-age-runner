@@ -11,6 +11,7 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
   oscillationSpeed = 20;
   constructor(scene, x, y, sprite, currentFruit, hero, direction, eatFX) {
     super(scene, x, y, sprite);
+
     this.fruit = scene.add.existing(this).setFrame(currentFruit);
     this.setOrigin(0, 0);
     this.scene.physics.world.enable(this);

@@ -76,7 +76,7 @@ class Stage extends Phaser.Scene {
     // this.music.play();
 
     this.ui = new Ui(this, this.game);
-    this.hero = new Hero(this, 64, 100, "hero", this.heroSounds);
+    this.hero = new Hero(this, 64, 200, "hero", this.heroSounds);
 
     this.jump = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
     this.accelerate = this.input.keyboard.addKey(

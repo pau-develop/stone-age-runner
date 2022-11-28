@@ -6,7 +6,6 @@ import {
   monkeyPositions,
 } from "../data/mapData";
 import Fruit from "./Fruit";
-import Hero from "./Hero";
 import Monkey from "./Monkey";
 
 class Map {
@@ -71,6 +70,16 @@ class Map {
           this.scrollingMap[i].spikes.x = 5120;
       }
       this.currentMap++;
+
+      this.addCollectibles(hero, scene, i, this.scrollingMap[i].ground);
+
+      // this.addMonkeys(
+      //   scene,
+      //   hero,
+      //   i,
+      //   this.scrollingMap[i].ground.x,
+      //   monkeyGroup
+      // );
     }
   }
 
@@ -97,17 +106,19 @@ class Map {
 
   spikeCollision(hero, tilemap, currentMap) {
     if (!hero.isSpiked) {
-      hero.playSound(5);
       if (hero.body.blocked.right) {
+        hero.playSound(5);
         return;
       }
       if (hero.body.blocked.up) {
+        hero.playSound(5);
         hero.body.velocity.x = 0;
         hero.body.velocity.y = 0;
         hero.isAlive = false;
         hero.isSpikedTop = true;
         return;
       }
+      hero.playSound(5);
       hero.isSpiked = true;
       hero.isAlive = false;
       hero.playSound(5);
@@ -169,15 +180,15 @@ class Map {
         this.scrollingMap[2].spikes.setCollision(collisionTilesSpikes);
       }
 
-      this.addCollectibles(hero, scene, randomMap, this.scrollingMap[2]);
+      this.addCollectibles(hero, scene, randomMap, this.scrollingMap[2].ground);
 
-      this.addMonkeys(
-        scene,
-        hero,
-        randomMap,
-        this.scrollingMap[2].ground.x,
-        monkeyGroup
-      );
+      // this.addMonkeys(
+      //   scene,
+      //   hero,
+      //   randomMap,
+      //   this.scrollingMap[2].ground.x,
+      //   monkeyGroup
+      // );
       const actualMap = this.currentMap;
       scene.physics.add.collider(hero, this.scrollingMap[2].ground);
       if (this.scrollingMap[2].spikes !== null)
@@ -194,8 +205,8 @@ class Map {
         this.spawnFruits(
           hero,
           scene,
-          element.x,
-          element.y,
+          element.col,
+          element.row,
           mapPosition,
           element.type
         );
@@ -209,8 +220,8 @@ class Map {
         monkeyGroup.push(
           new Monkey(
             scene,
-            mapPosition + element.x,
-            element.y,
+            mapPosition + element.col,
+            element.row,
             "monkey",
             hero,
             this
@@ -226,12 +237,12 @@ class Map {
     }
   }
 
-  spawnFruits(hero, scene, xPos, yPos, mapPosition, fruitGroup) {
+  spawnFruits(hero, scene, col, row, mapPosition, fruitGroup) {
     for (let i = 0; i < fruitGroup.length; i++) {
       new Fruit(
         scene,
-        mapPosition.x + xPos + fruitGroup[i].x,
-        mapPosition.y + yPos + fruitGroup[i].y,
+        mapPosition.x + col * 32 + fruitGroup[i].x,
+        mapPosition.y + row * 32 - 16 + fruitGroup[i].y,
         "fruits",
         Math.round(Math.random() * 4),
         hero,
