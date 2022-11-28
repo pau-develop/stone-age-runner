@@ -21,6 +21,7 @@ class Stage extends Phaser.Scene {
   meters;
   music;
   heroSounds = new Array();
+
   constructor() {
     super("Stage");
   }
@@ -168,7 +169,7 @@ class Stage extends Phaser.Scene {
         }
       } else if (this.hero.doubleJumped) {
         if (this.hero.heroEnergy > 0) {
-          this.hero.body.velocity.y = this.hero.jumpForce;
+          this.hero.body.velocity.y = this.hero.doubleJumpForce;
           this.hero.consumeEnergyBar();
           this.hero.emitSteam();
         } else if (this.hero.heroEnergy <= 0) this.hero.isJumping = false;

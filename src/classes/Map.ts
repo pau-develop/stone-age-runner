@@ -6,7 +6,23 @@ import Monkey from "./Monkey";
 class Map {
   currentMap = 0;
   maps = [
+    "assets/tiles/map8.json",
+    "assets/tiles/map8s.json",
+    "assets/tiles/map8s.json",
+    "assets/tiles/map8.json",
+    "assets/tiles/map7s.json",
+    "assets/tiles/map7.json",
+    "assets/tiles/map5s6.json",
+    "assets/tiles/map5s5.json",
+    "assets/tiles/map5s4.json",
+    "assets/tiles/map5s4.json",
+    "assets/tiles/map5s4.json",
+    "assets/tiles/map1s2.json",
+    "assets/tiles/map6s.json",
+    "assets/tiles/map6s.json",
+    "assets/tiles/map6s.json",
     "assets/tiles/map5s2.json",
+    "assets/tiles/map5s3.json",
     "assets/tiles/map5s2.json",
     "assets/tiles/map5s2.json",
     "assets/tiles/map0s.json",
@@ -15,7 +31,6 @@ class Map {
     "assets/tiles/map1s.json",
     "assets/tiles/map2s.json",
     "assets/tiles/map4s.json",
-    "assets/tiles/map6s.json",
     "assets/tiles/map0.json",
     "assets/tiles/map1.json",
     "assets/tiles/map2.json",
@@ -44,7 +59,7 @@ class Map {
       //NO 1,2,3,4,5,6,9,10,11,14,15,18
       //SI 7,8,12,13,16,17
       this.scrollingMap[i].ground.setCollision([
-        7, 8, 12, 13, 14, 16, 17, 18, 26, 28, 30, 34, 37, 40, 41, 42, 51,
+        7, 8, 12, 13, 14, 16, 17, 18, 26, 28, 29, 30, 34, 37, 40, 41, 42, 51,
       ]);
       if (this.scrollingMap[i].spikes !== null) {
         this.scrollingMap[i].spikes.setCollision([
@@ -105,6 +120,7 @@ class Map {
     const differenceBetweenHeroAndMap = Math.abs(
       mapStartPos - Math.round(hero.x)
     );
+    console.log("HEROPOS", hero.x, hero.y);
     //FIND number
     const col = this.getMultiple(Math.round(hero.y + 22));
     const row = this.getMultiple(differenceBetweenHeroAndMap);
@@ -115,6 +131,7 @@ class Map {
     if (!hero.isSpiked) {
       if (hero.body.blocked.right) {
         hero.playSound(5);
+        console.log("checking spike right");
         return;
       }
       if (hero.body.blocked.up) {
@@ -125,25 +142,36 @@ class Map {
         hero.playSound(5);
         return;
       }
-      console.log("running");
+      hero.isSpiked = true;
+      hero.isAlive = false;
       hero.playSound(5);
       hero.body.velocity.x = 0;
       hero.body.velocity.y = 0;
       this.camera.stopFollow();
       hero.body.setAllowGravity(false);
-      hero.isSpiked = true;
-      hero.isAlive = false;
-      const tilePosition = this.getRowAndColumn(hero, currentMap);
-      console.log(tilePosition);
-      if (tilePosition[0] !== undefined && tilePosition[1] !== undefined) {
-        if (
-          tilemap.layer.data[tilePosition[1] + 1][tilePosition[0] + 1].index ===
-          -1
-        ) {
-          hero.spikedX = tilePosition[2] + 32 * tilePosition[0] - 32;
-        } else hero.spikedX = tilePosition[2] + 32 * tilePosition[0];
 
+      const tilePosition = this.getRowAndColumn(hero, currentMap);
+
+      if (tilePosition[0] !== undefined && tilePosition[1] !== undefined) {
+        console.log(tilePosition);
+
+        if (
+          tilemap.layer.data[tilePosition[1] + 1][tilePosition[0] + 1] !==
+            null &&
+          tilemap.layer.data[tilePosition[1] + 1][tilePosition[0] + 1] !==
+            undefined
+        ) {
+          console.log(tilemap.layer);
+          if (
+            tilemap.layer.data[tilePosition[1] + 1][tilePosition[0] + 1]
+              .index === -1
+          )
+            hero.spikedX = tilePosition[2] + 32 * tilePosition[0] - 32;
+          else hero.spikedX = tilePosition[2] + 32 * tilePosition[0];
+        }
+        console.log(tilePosition);
         hero.spikedY = (tilePosition[1] - 1) * 32;
+        console.log("SPIKEDXY", hero.spikedY, hero.spikedX);
         if (hero.spikedX > hero.x) hero.spikedXDir = 1;
         else if (hero.spikedX < hero.x) hero.spikedXDir = -1;
       }
@@ -177,7 +205,7 @@ class Map {
       if (this.scrollingMap[2].spikes !== null)
         this.scrollingMap[2].spikes.x = this.scrollingMap[1].ground.x + 2560;
       this.scrollingMap[2].ground.setCollision([
-        7, 8, 12, 13, 14, 16, 17, 18, 26, 28, 30, 34, 37, 40, 41, 42, 51,
+        7, 8, 12, 13, 14, 16, 17, 18, 26, 28, 29, 30, 34, 37, 40, 41, 42, 51,
       ]);
       if (this.scrollingMap[2].spikes !== null) {
         this.scrollingMap[2].spikes.setCollision([

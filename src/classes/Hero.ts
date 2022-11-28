@@ -8,6 +8,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   doubleJumped = false;
   jumpLimit: number;
   jumpForce = -200;
+  doubleJumpForce = -150;
   hitMobForce = -300;
   justCrashed = false;
   bounceSpeed = -50;
@@ -77,6 +78,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
       }
       if (this.body.blocked.right) {
         if (!this.checkBlocked) {
+          console.log("checking right...");
           this.body.y = this.body.y + 2;
           this.checkBlocked = true;
           return;
@@ -154,7 +156,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     if (!this.isConsuming) {
       this.isConsuming = true;
       const interval = setInterval(() => {
-        if (this.heroEnergy > 0) this.heroEnergy -= 1;
+        if (this.heroEnergy > 0) this.heroEnergy -= 0.5;
         else this.heroEnergy = 0;
         this.isConsuming = false;
         clearInterval(interval);
