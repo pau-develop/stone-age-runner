@@ -45,36 +45,9 @@ class Map {
         });
       }
 
-      if (i === 0) {
-        this.scrollingMap[i].ground.x = 0;
-        this.scrollingMap[i].back.x = 0;
-        if (this.scrollingMap[i].front !== null)
-          this.scrollingMap[i].front.x = 0;
-        if (this.scrollingMap[i].spikes !== null)
-          this.scrollingMap[i].spikes.x = 0;
-      }
-      if (i === 1) {
-        this.scrollingMap[i].ground.x = 2560;
-        this.scrollingMap[i].back.x = 2560;
-        if (this.scrollingMap[i].front !== null)
-          this.scrollingMap[i].front.x = 2560;
-        if (this.scrollingMap[i].spikes !== null)
-          this.scrollingMap[i].spikes.x = 2560;
-      }
-      if (i === 2) {
-        this.scrollingMap[i].ground.x = 5120;
-        this.scrollingMap[i].back.x = 5120;
-        if (this.scrollingMap[i].front !== null)
-          this.scrollingMap[i].front.x = 5120;
-        if (this.scrollingMap[i].spikes !== null)
-          this.scrollingMap[i].spikes.x = 5120;
-      }
-      this.scrollingMap[i].ground.depth = -48;
-      if (this.scrollingMap[i].front !== null)
-        this.scrollingMap[i].front.depth = -46;
-      if (this.scrollingMap[i].spikes !== null)
-        this.scrollingMap[i].spikes.depth = -48;
-      this.scrollingMap[i].back.depth = -49;
+      this.setMapPosition(i);
+
+      this.setLayerDepth(i);
 
       this.currentMap++;
 
@@ -88,6 +61,24 @@ class Map {
         monkeyGroup
       );
     }
+  }
+
+  setLayerDepth(currentMap: number) {
+    this.scrollingMap[currentMap].ground.depth = -48;
+    if (this.scrollingMap[currentMap].front !== null)
+      this.scrollingMap[currentMap].front.depth = -46;
+    if (this.scrollingMap[currentMap].spikes !== null)
+      this.scrollingMap[currentMap].spikes.depth = -48;
+    this.scrollingMap[currentMap].back.depth = -49;
+  }
+
+  setMapPosition(currentMap: number) {
+    this.scrollingMap[currentMap].ground.x = currentMap * 2560;
+    this.scrollingMap[currentMap].back.x = currentMap * 2560;
+    if (this.scrollingMap[currentMap].front !== null)
+      this.scrollingMap[currentMap].front.x = currentMap * 2560;
+    if (this.scrollingMap[currentMap].spikes !== null)
+      this.scrollingMap[currentMap].spikes.x = currentMap * 2560;
   }
 
   getMultiple(number) {
@@ -104,8 +95,6 @@ class Map {
     const differenceBetweenHeroAndMap = Math.abs(
       mapStartPos - Math.round(hero.x)
     );
-    console.log("HEROPOS", hero.x, hero.y);
-    //FIND number
     const col = this.getMultiple(Math.round(hero.y + 22));
     const row = this.getMultiple(differenceBetweenHeroAndMap);
     return [row, col, mapStartPos];
@@ -162,10 +151,8 @@ class Map {
   }
 
   public shiftMaps(hero, monkeyGroup, scene) {
-    // REMOVE FIRST INDEX WHEN PLAYER REACHES x 2560
     if (hero.x >= this.scrollingMap[0].ground.x + 2560)
       this.scrollingMap.shift();
-    // ADD IT TO THE END OF THE ARRAY
     if (this.scrollingMap.length < 3) {
       const randomMap = Math.floor(Math.random() * this.maps.length);
       const map = scene.make.tilemap({ key: `tilemap${randomMap}` });
@@ -176,7 +163,7 @@ class Map {
         front: map.createLayer("front", map.addTilesetImage("wild", "tiles")),
         spikes: map.createLayer("spikes", map.addTilesetImage("wild", "tiles")),
       });
-      console.log(this.scrollingMap[2]);
+
       this.scrollingMap[2].ground.x = this.scrollingMap[1].ground.x + 2560;
       this.scrollingMap[2].ground.setCollision(collisionTilesGround);
       this.scrollingMap[2].back.x = this.scrollingMap[1].ground.x + 2560;
@@ -196,19 +183,18 @@ class Map {
         this.scrollingMap[2].ground.x,
         monkeyGroup
       );
+
       const actualMap = this.currentMap;
+
       scene.physics.add.collider(hero, this.scrollingMap[2].ground);
+
       if (this.scrollingMap[2].spikes !== null)
         scene.physics.add.collider(hero, this.scrollingMap[2].spikes, () => {
           this.spikeCollision(hero, this.scrollingMap[2].spikes, actualMap);
         });
+
       this.currentMap++;
-      this.scrollingMap[2].ground.depth = -48;
-      if (this.scrollingMap[2].front !== null)
-        this.scrollingMap[2].front.depth = -46;
-      if (this.scrollingMap[2].spikes !== null)
-        this.scrollingMap[2].spikes.depth = -48;
-      this.scrollingMap[2].back.depth = -49;
+      this.setLayerDepth(2);
     }
   }
 
