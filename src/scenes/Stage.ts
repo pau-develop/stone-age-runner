@@ -21,6 +21,7 @@ class Stage extends Phaser.Scene {
   meters;
   music;
   heroSounds = new Array();
+
   constructor() {
     super("Stage");
   }
@@ -75,7 +76,7 @@ class Stage extends Phaser.Scene {
     // this.music.play();
 
     this.ui = new Ui(this, this.game);
-    this.hero = new Hero(this, 64, 100, "hero", this.heroSounds);
+    this.hero = new Hero(this, 64, 200, "hero", this.heroSounds);
 
     this.jump = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
     this.accelerate = this.input.keyboard.addKey(
@@ -91,6 +92,14 @@ class Stage extends Phaser.Scene {
     this.background.setScrollFactor(0, 0);
     this.cameras.main.startFollow(this.hero, true, 1, 1, -192, 0);
     this.cameras.main.setBounds(0, 0, NaN, 360);
+    ////
+
+    this.monkeyGroup.forEach((monkey) => {
+      this.map.scrollingMap.forEach((map) => {
+        this.physics.add.collider(monkey, map.ground);
+        map.spikes !== null && this.physics.add.collider(monkey, map.spikes);
+      });
+    });
   }
 
   update() {
@@ -100,12 +109,13 @@ class Stage extends Phaser.Scene {
     this.ui.getFPS(this.game);
     this.ui.controlBar(this.hero.heroEnergy);
     this.hero.checkForCollision();
+
     if (this.monkeyGroup.length > 0) {
       this.monkeyGroup.forEach((monkey) => {
         monkey.checkForCollision();
         monkey.checkBounds(this.cameras.main);
         monkey.playAnimations();
-        monkey.moveMonkey();
+        monkey.moveCharacter();
       });
     }
     this.removeMonkeys();
@@ -115,7 +125,7 @@ class Stage extends Phaser.Scene {
     this.getInput();
     if (this.hero.isAlive) {
       this.map.shiftMaps(this.hero, this.monkeyGroup, this);
-      this.hero.moveHero();
+      this.hero.moveCharacter();
     } else if (!this.hero.isAlive) {
       if (!this.hero.justCrashed) {
         this.ui.displayDeathMessage(this);
@@ -168,7 +178,7 @@ class Stage extends Phaser.Scene {
         }
       } else if (this.hero.doubleJumped) {
         if (this.hero.heroEnergy > 0) {
-          this.hero.body.velocity.y = this.hero.jumpForce;
+          this.hero.body.velocity.y = this.hero.doubleJumpForce;
           this.hero.consumeEnergyBar();
           this.hero.emitSteam();
         } else if (this.hero.heroEnergy <= 0) this.hero.isJumping = false;

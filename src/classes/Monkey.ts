@@ -1,93 +1,64 @@
-class Monkey extends Phaser.Physics.Arcade.Sprite {
-  scene;
-  monkey;
-  isAlive = true;
-  justCrashed = false;
-  bounceSpeed = 50;
+import Character from "./Character";
+
+class Monkey extends Character {
   isStomped = false;
-  shouldMove = false;
   canBeRemoved = false;
   constructor(scene, x, y, sprite, hero, map) {
     super(scene, x, y, sprite);
-    this.scene = scene;
-    this.monkey = this.scene.add.existing(this);
-    this.monkey.setDepth(50);
-    this.scene.physics.world.enable(this);
-    this.setOrigin(0, 0);
-    hero.setColliders(this.monkey);
-    // map.setColliders(this.monkey);
+    this.bounceSpeed = 50;
+    this.speed = -50;
+    hero.setColliders(this);
     this.init();
     this.createAnimations();
     this.play("run");
   }
 
   init() {
-    this.monkey.body.setSize(32, 45);
-    this.monkey.body.offset.y = 18;
-  }
-
-  moveMonkey() {
-    if (this.shouldMove) {
-      this.monkey.body.velocity.x = -100;
-      this.monkey.body.x = Math.round(this.monkey.body.x);
-    }
+    this.body.setSize(44, 45);
+    this.body.offset.y = 17;
+    this.body.offset.x = 5;
   }
 
   checkForCollision() {
     if (!this.isAlive) {
+      this.body.setSize(60, 45);
+      this.body.offset.y = 17;
       if (this.justCrashed) {
-        if (this.monkey.bounceSpeed > 0) this.monkey.bounceSpeed -= 1;
+        if (this.bounceSpeed > 0) this.bounceSpeed -= 1;
         else {
-          this.monkey.bounceSpeed = 0;
+          this.bounceSpeed = 0;
           this.canBeRemoved = true;
         }
-        this.monkey.body.velocity.x = this.monkey.bounceSpeed;
+        this.body.velocity.x = this.bounceSpeed;
       } else if (this.isStomped) this.canBeRemoved = true;
     } else {
-      if (this.monkey.body.blocked.left) {
+      if (this.body.blocked.left) {
+        this.isAlive = false;
         this.shouldMove = false;
         this.justCrashed = true;
-        this.isAlive = false;
       }
     }
   }
 
   createAnimations() {
-    this.createAnimation("run", 0, 11, 50, -1);
-    this.createAnimation("crash", 12, 21, 25, 0);
-    this.createAnimation("crash-air", 22, 23, 25, 0);
-    this.createAnimation("crash-land", 24, 29, 25, 0);
-    this.createAnimation("stomped", 30, 35, 18, 0);
-    this.createAnimation("fall", 39, 40, 5, 0);
-    this.createAnimation("land", 41, 44, 25, 0);
-  }
-
-  createAnimation(
-    key: string,
-    start: number,
-    end: number,
-    rate: number,
-    repeat: number
-  ) {
-    this.anims.create({
-      key: key,
-      frames: this.anims.generateFrameNumbers("monkey", {
-        start: start,
-        end: end,
-      }),
-      frameRate: rate,
-      repeat: repeat,
-    });
+    this.createAnimation("run", 0, 11, 40, -1, "monkey");
+    this.createAnimation("crash", 12, 21, 25, 0, "monkey");
+    this.createAnimation("crash-air", 22, 23, 25, 0, "monkey");
+    this.createAnimation("crash-land", 24, 29, 25, 0, "monkey");
+    this.createAnimation("stomped", 30, 35, 18, 0, "monkey");
+    this.createAnimation("fall", 39, 40, 5, 0, "monkey");
+    this.createAnimation("land", 41, 44, 25, 0, "monkey");
   }
 
   checkBounds(camera) {
     if (
-      this.monkey.body.x <= camera.scrollX + 640 &&
-      this.monkey.body.x >= camera.scrollX &&
+      this.body.x <= camera.scrollX + 640 &&
+      this.body.x >= camera.scrollX &&
       this.isAlive
-    )
+    ) {
       this.shouldMove = true;
-    else if (this.monkey.body.x < camera.scrollX) this.canBeRemoved = true;
+    } else if (this.body.x < camera.scrollX) this.canBeRemoved = true;
+    else this.shouldMove = false;
   }
 
   playAnimations() {
