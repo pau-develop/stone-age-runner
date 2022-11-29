@@ -37,7 +37,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
     this.scene.add.existing(this);
     this.scene.physics.world.enable(this);
     this.setOrigin(0, 0);
-    this.setDepth(50);
+    this.depth = -47;
     this.init();
     this.createAnimations();
     this.play("run");
@@ -285,6 +285,8 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
         this.play("run");
       }
     } else {
+      this.body.setSize(54, this.colliderY);
+
       if (
         (this.isSpiked || this.isSpikedTop) &&
         this.anims.currentAnim.key !== "pinched"

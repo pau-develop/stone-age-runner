@@ -11,7 +11,7 @@ class Monkey extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, sprite);
     this.scene = scene;
     this.monkey = this.scene.add.existing(this);
-    this.monkey.setDepth(50);
+    this.monkey.depth = -47;
     this.scene.physics.world.enable(this);
     this.setOrigin(0, 0);
     hero.setColliders(this.monkey);
@@ -22,8 +22,9 @@ class Monkey extends Phaser.Physics.Arcade.Sprite {
   }
 
   init() {
-    this.monkey.body.setSize(32, 45);
-    this.monkey.body.offset.y = 18;
+    this.monkey.body.setSize(44, 45);
+    this.monkey.body.offset.y = 17;
+    this.monkey.body.offset.x = 5;
   }
 
   moveMonkey() {
@@ -35,6 +36,8 @@ class Monkey extends Phaser.Physics.Arcade.Sprite {
 
   checkForCollision() {
     if (!this.isAlive) {
+      this.body.setSize(60, 45);
+      this.monkey.body.offset.y = 17;
       if (this.justCrashed) {
         if (this.monkey.bounceSpeed > 0) this.monkey.bounceSpeed -= 1;
         else {

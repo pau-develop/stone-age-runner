@@ -69,6 +69,13 @@ class Map {
         if (this.scrollingMap[i].spikes !== null)
           this.scrollingMap[i].spikes.x = 5120;
       }
+      this.scrollingMap[i].ground.depth = -48;
+      if (this.scrollingMap[i].front !== null)
+        this.scrollingMap[i].front.depth = -46;
+      if (this.scrollingMap[i].spikes !== null)
+        this.scrollingMap[i].spikes.depth = -48;
+      this.scrollingMap[i].back.depth = -49;
+
       this.currentMap++;
 
       this.addCollectibles(hero, scene, i, this.scrollingMap[i].ground);
@@ -196,6 +203,12 @@ class Map {
           this.spikeCollision(hero, this.scrollingMap[2].spikes, actualMap);
         });
       this.currentMap++;
+      this.scrollingMap[2].ground.depth = -48;
+      if (this.scrollingMap[2].front !== null)
+        this.scrollingMap[2].front.depth = -46;
+      if (this.scrollingMap[2].spikes !== null)
+        this.scrollingMap[2].spikes.depth = -48;
+      this.scrollingMap[2].back.depth = -49;
     }
   }
 
