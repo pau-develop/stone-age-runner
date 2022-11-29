@@ -109,12 +109,13 @@ class Stage extends Phaser.Scene {
     this.ui.getFPS(this.game);
     this.ui.controlBar(this.hero.heroEnergy);
     this.hero.checkForCollision();
+
     if (this.monkeyGroup.length > 0) {
       this.monkeyGroup.forEach((monkey) => {
         monkey.checkForCollision();
         monkey.checkBounds(this.cameras.main);
         monkey.playAnimations();
-        monkey.moveMonkey();
+        monkey.moveCharacter();
       });
     }
     this.removeMonkeys();
@@ -124,7 +125,7 @@ class Stage extends Phaser.Scene {
     this.getInput();
     if (this.hero.isAlive) {
       this.map.shiftMaps(this.hero, this.monkeyGroup, this);
-      this.hero.moveHero();
+      this.hero.moveCharacter();
     } else if (!this.hero.isAlive) {
       if (!this.hero.justCrashed) {
         this.ui.displayDeathMessage(this);

@@ -1,16 +1,15 @@
+import Character from "./Character";
 import FloatingText from "./FloatingText";
 import Steam from "./Steam";
 
-class Hero extends Phaser.Physics.Arcade.Sprite {
+class Hero extends Character {
   touchedSpikes = false;
-  isAlive = true;
   isJumping = false;
   doubleJumped = false;
   jumpLimit: number;
   jumpForce = -200;
   doubleJumpForce = -150;
   hitMobForce = -300;
-  justCrashed = false;
   bounceSpeed = -50;
   heroSpeed = 250;
   heroEnergy = 100;
@@ -33,11 +32,7 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
 
   constructor(scene, x, y, sprite, heroSounds) {
     super(scene, x, y, sprite);
-    this.scene = scene;
-    this.scene.add.existing(this);
-    this.scene.physics.world.enable(this);
-    this.setOrigin(0, 0);
-    this.depth = -47;
+    this.shouldMove = true;
     this.init();
     this.createAnimations();
     this.play("run");
@@ -56,12 +51,6 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
       new Steam(this.scene, this.x + 30, this.y + 35, "steam");
       this.counter = 0;
     }
-  }
-
-  moveHero() {
-    this.body.velocity.x = this.heroSpeed;
-    //round the x pos so sprite won't jitter around
-    this.body.x = Math.round(this.body.x);
   }
 
   checkEnergyStatus() {
@@ -127,7 +116,6 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
 
   setColliders(monkey) {
     this.scene.physics.add.collider(monkey, this, () => {
-      monkey.shouldMove = false;
       if (this.body.touching.right) {
         this.isCrashed = true;
         this.isAlive = false;
@@ -165,34 +153,16 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
   }
 
   createAnimations() {
-    this.createAnimation("run", 0, 11, 25, -1);
-    this.createAnimation("jump", 27, 35, 25, 0);
-    this.createAnimation("fall", 36, 37, 25, 0);
-    this.createAnimation("land", 38, 42, 25, 0);
-    this.createAnimation("crash", 43, 52, 25, 0);
-    this.createAnimation("crash-air", 53, 54, 5, -1);
-    this.createAnimation("crash-land", 55, 59, 25, 0);
-    this.createAnimation("double-jump", 60, 68, 80, 0);
-    this.createAnimation("double-jump-fall", 70, 72, 25, 0);
-    this.createAnimation("pinched", 72, 79, 25, 0);
-  }
-
-  createAnimation(
-    key: string,
-    start: number,
-    end: number,
-    rate: number,
-    repeat: number
-  ) {
-    this.anims.create({
-      key: key,
-      frames: this.anims.generateFrameNumbers("hero", {
-        start: start,
-        end: end,
-      }),
-      frameRate: rate,
-      repeat: repeat,
-    });
+    this.createAnimation("run", 0, 11, 25, -1, "hero");
+    this.createAnimation("jump", 27, 35, 25, 0, "hero");
+    this.createAnimation("fall", 36, 37, 25, 0, "hero");
+    this.createAnimation("land", 38, 42, 25, 0, "hero");
+    this.createAnimation("crash", 43, 52, 25, 0, "hero");
+    this.createAnimation("crash-air", 53, 54, 5, -1, "hero");
+    this.createAnimation("crash-land", 55, 59, 25, 0, "hero");
+    this.createAnimation("double-jump", 60, 68, 80, 0, "hero");
+    this.createAnimation("double-jump-fall", 70, 72, 25, 0, "hero");
+    this.createAnimation("pinched", 72, 79, 25, 0, "hero");
   }
 
   playSounds() {
@@ -260,7 +230,6 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
         !this.body.blocked.down &&
         this.body.velocity.y > 0 &&
         this.anims.currentAnim.key !== "fall"
-        // this.anims.currentAnim.key === "jump"
       )
         this.play("fall");
       else if (
