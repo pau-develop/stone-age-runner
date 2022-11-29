@@ -420,8 +420,78 @@ export const fruitPositions = [
 
 //each index matches de index of maps property in Map class
 export const monkeyPositions = [
-  [{ col: 576, row: 0 }],
-  [{ col: 576, row: 0 }],
-  [{ col: 576, row: 0 }],
-  [{ col: 384, row: 0 }],
+  //MAP0
+  [
+    { col: 28, row: 0 },
+    { col: 48, row: 0 },
+    { col: 68, row: 0 },
+  ],
+
+  //MAP1
+  [
+    { col: 24, row: 0 },
+    { col: 44, row: 0 },
+    { col: 64, row: 0 },
+  ],
+  //MAP2
+  [],
+  //MAP0S
+  [
+    { col: 28, row: 0 },
+    { col: 48, row: 0 },
+    { col: 68, row: 0 },
+  ],
+  //MAP1S
+  [
+    { col: 24, row: 0 },
+    { col: 44, row: 0 },
+    { col: 64, row: 0 },
+  ],
+  //MAP1S2
+  [],
+  //MAP2S
+  [{ col: 48, row: 0 }],
+  //MAP3
+  [
+    { col: 11, row: 0 },
+    { col: 78, row: 0 },
+  ],
+  //MAP4
+  [{ col: 46, row: 0 }],
+  //MAP4S
+  [{ col: 76, row: 0 }],
+  //MAP5
+  [
+    { col: 11, row: 0 },
+    { col: 45, row: 0 },
+    { col: 78, row: 0 },
+  ],
+  //MAP5S
+  [],
+  //MAP5S2
+  [
+    { col: 11, row: 0 },
+    { col: 78, row: 0 },
+  ],
+  //MAP5S3
+  [
+    { col: 11, row: 0 },
+    { col: 78, row: 0 },
+  ],
+  //MAP5S4
+  [],
+  //MAP5S5
+  [],
+  //MAP5S6
+  [],
+  //MAP6
+  [
+    { col: 28, row: 0 },
+    { col: 62, row: 0 },
+  ],
+  //MAP6
+  [
+    { col: 11, row: 0 },
+    { col: 76, row: 0 },
+  ],
 ];

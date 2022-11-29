@@ -92,6 +92,14 @@ class Stage extends Phaser.Scene {
     this.background.setScrollFactor(0, 0);
     this.cameras.main.startFollow(this.hero, true, 1, 1, -192, 0);
     this.cameras.main.setBounds(0, 0, NaN, 360);
+    ////
+
+    this.monkeyGroup.forEach((monkey) => {
+      this.map.scrollingMap.forEach((map) => {
+        this.physics.add.collider(monkey, map.ground);
+        map.spikes !== null && this.physics.add.collider(monkey, map.spikes);
+      });
+    });
   }
 
   update() {

@@ -28,7 +28,7 @@ class Monkey extends Phaser.Physics.Arcade.Sprite {
 
   moveMonkey() {
     if (this.shouldMove) {
-      this.monkey.body.velocity.x = -100;
+      this.monkey.body.velocity.x = -50;
       this.monkey.body.x = Math.round(this.monkey.body.x);
     }
   }
@@ -53,7 +53,7 @@ class Monkey extends Phaser.Physics.Arcade.Sprite {
   }
 
   createAnimations() {
-    this.createAnimation("run", 0, 11, 50, -1);
+    this.createAnimation("run", 0, 11, 40, -1);
     this.createAnimation("crash", 12, 21, 25, 0);
     this.createAnimation("crash-air", 22, 23, 25, 0);
     this.createAnimation("crash-land", 24, 29, 25, 0);
@@ -85,9 +85,9 @@ class Monkey extends Phaser.Physics.Arcade.Sprite {
       this.monkey.body.x <= camera.scrollX + 640 &&
       this.monkey.body.x >= camera.scrollX &&
       this.isAlive
-    )
+    ) {
       this.shouldMove = true;
-    else if (this.monkey.body.x < camera.scrollX) this.canBeRemoved = true;
+    } else if (this.monkey.body.x < camera.scrollX) this.canBeRemoved = true;
   }
 
   playAnimations() {

@@ -73,13 +73,13 @@ class Map {
 
       this.addCollectibles(hero, scene, i, this.scrollingMap[i].ground);
 
-      // this.addMonkeys(
-      //   scene,
-      //   hero,
-      //   i,
-      //   this.scrollingMap[i].ground.x,
-      //   monkeyGroup
-      // );
+      this.addMonkeys(
+        scene,
+        hero,
+        i,
+        this.scrollingMap[i].ground.x,
+        monkeyGroup
+      );
     }
   }
 
@@ -182,13 +182,13 @@ class Map {
 
       this.addCollectibles(hero, scene, randomMap, this.scrollingMap[2].ground);
 
-      // this.addMonkeys(
-      //   scene,
-      //   hero,
-      //   randomMap,
-      //   this.scrollingMap[2].ground.x,
-      //   monkeyGroup
-      // );
+      this.addMonkeys(
+        scene,
+        hero,
+        randomMap,
+        this.scrollingMap[2].ground.x,
+        monkeyGroup
+      );
       const actualMap = this.currentMap;
       scene.physics.add.collider(hero, this.scrollingMap[2].ground);
       if (this.scrollingMap[2].spikes !== null)
@@ -220,7 +220,7 @@ class Map {
         monkeyGroup.push(
           new Monkey(
             scene,
-            mapPosition + element.col,
+            mapPosition + element.col * 32,
             element.row,
             "monkey",
             hero,
