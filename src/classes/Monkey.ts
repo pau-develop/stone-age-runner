@@ -2,7 +2,6 @@ import Character from "./Character";
 
 class Monkey extends Character {
   isStomped = false;
-  shouldMove = false;
   canBeRemoved = false;
   constructor(scene, x, y, sprite, hero, map) {
     super(scene, x, y, sprite);
@@ -34,9 +33,9 @@ class Monkey extends Character {
       } else if (this.isStomped) this.canBeRemoved = true;
     } else {
       if (this.body.blocked.left) {
+        this.isAlive = false;
         this.shouldMove = false;
         this.justCrashed = true;
-        this.isAlive = false;
       }
     }
   }
@@ -52,7 +51,6 @@ class Monkey extends Character {
   }
 
   checkBounds(camera) {
-    console.log(camera.scrollX + 640, this.body.x, this.isAlive);
     if (
       this.body.x <= camera.scrollX + 640 &&
       this.body.x >= camera.scrollX &&
@@ -60,6 +58,7 @@ class Monkey extends Character {
     ) {
       this.shouldMove = true;
     } else if (this.body.x < camera.scrollX) this.canBeRemoved = true;
+    else this.shouldMove = false;
   }
 
   playAnimations() {
