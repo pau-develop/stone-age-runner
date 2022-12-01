@@ -103,7 +103,6 @@ class Stage extends Phaser.Scene {
     this.meters = Math.round(this.cameras.main.scrollX / 64);
     this.ui.displayDistance(this.meters);
     this.ui.displayScore(this.hero.score);
-    this.ui.getFPS(this.game);
     this.ui.controlBar(this.hero.heroEnergy);
     this.hero.checkForCollision();
 
@@ -125,7 +124,7 @@ class Stage extends Phaser.Scene {
       this.hero.moveCharacter();
     } else if (!this.hero.isAlive) {
       if (!this.hero.justCrashed) {
-        this.ui.displayDeathMessage(this);
+        this.ui.displayDeathMessage(this, this.meters, this.hero.score);
         this.hero.body.velocity.y = 0;
         this.hero.justCrashed = true;
       }

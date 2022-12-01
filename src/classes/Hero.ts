@@ -67,7 +67,6 @@ class Hero extends Character {
       }
       if (this.body.blocked.right) {
         if (!this.checkBlocked) {
-          console.log("checking right...");
           this.body.y = this.body.y + 2;
           this.checkBlocked = true;
           return;
@@ -134,11 +133,11 @@ class Hero extends Character {
     if (!this.isConsuming) {
       this.isConsuming = true;
       const interval = setInterval(() => {
-        if (this.heroEnergy > 0) this.heroEnergy -= 0.5;
+        if (this.heroEnergy > 0) this.heroEnergy -= 1;
         else this.heroEnergy = 0;
         this.isConsuming = false;
         clearInterval(interval);
-      }, 15);
+      }, 10);
     }
   }
 

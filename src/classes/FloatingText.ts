@@ -3,8 +3,8 @@ class FloatingText extends Phaser.Physics.Arcade.Sprite {
   textShadow;
   sprite;
   scene;
-  colors = [0xeee300, 0xeee300, 0xee3600, 0xee3600];
-  altColors = [0xffffff, 0xffffff, 0xffffff, 0xffffff];
+  color = 0x00adcc;
+  altColor = 0xffffff;
   flag = false;
   counter = 0;
   constructor(scene, points, x, y) {
@@ -16,9 +16,7 @@ class FloatingText extends Phaser.Physics.Arcade.Sprite {
     this.textShadow = scene.add
       .bitmapText(x + 2, y + 2, "2p", points, 8)
       .setTint(0x000000, 0x000000, 0x000000, 0x000000);
-    this.text = scene.add
-      .bitmapText(x, y, "2p", points, 8)
-      .setTint(this.colors[0], this.colors[1], this.colors[2], this.colors[3]);
+    this.text = scene.add.bitmapText(x, y, "2p", points, 8).setTint(this.color);
 
     this.visible = false;
     const randomSpeed = Math.round(Math.random() * (30 - 10) + 10) * -1;
@@ -34,19 +32,9 @@ class FloatingText extends Phaser.Physics.Arcade.Sprite {
     this.counter++;
     if (this.counter >= 4) {
       if (this.flag) {
-        this.text.setTint(
-          this.colors[0],
-          this.colors[1],
-          this.colors[2],
-          this.colors[3]
-        );
+        this.text.setTint(this.color);
       } else {
-        this.text.setTint(
-          this.altColors[0],
-          this.altColors[1],
-          this.altColors[2],
-          this.altColors[3]
-        );
+        this.text.setTint(this.altColor);
       }
       this.flag = !this.flag;
       this.counter = 0;
