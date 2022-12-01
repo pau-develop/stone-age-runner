@@ -18,10 +18,10 @@ export const maps = [
   "assets/tiles/map5s6.json",
   "assets/tiles/map6.json",
   "assets/tiles/map6s.json",
+  "assets/tiles/map7.json",
   "assets/tiles/map7s.json",
   "assets/tiles/map8.json",
   "assets/tiles/map8s.json",
-  "assets/tiles/map7.json",
 ];
 
 export const collisionTilesGround = [

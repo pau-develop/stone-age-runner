@@ -122,27 +122,6 @@ class Map {
       hero.body.velocity.y = 0;
       this.camera.stopFollow();
       hero.body.setAllowGravity(false);
-
-      const tilePosition = this.getRowAndColumn(hero, currentMap);
-
-      if (tilePosition[0] !== undefined && tilePosition[1] !== undefined) {
-        if (
-          tilemap.layer.data[tilePosition[1] + 1][tilePosition[0] + 1] !==
-            null &&
-          tilemap.layer.data[tilePosition[1] + 1][tilePosition[0] + 1] !==
-            undefined
-        ) {
-          if (
-            tilemap.layer.data[tilePosition[1] + 1][tilePosition[0] + 1]
-              .index === -1
-          )
-            hero.spikedX = tilePosition[2] + 32 * tilePosition[0] - 32;
-          else hero.spikedX = tilePosition[2] + 32 * tilePosition[0];
-        }
-        hero.spikedY = (tilePosition[1] - 1) * 32;
-        if (hero.spikedX > hero.x) hero.spikedXDir = 1;
-        else if (hero.spikedX < hero.x) hero.spikedXDir = -1;
-      }
     }
   }
 
