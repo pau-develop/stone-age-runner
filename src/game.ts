@@ -1,5 +1,6 @@
 import "phaser";
 import Stage from "./scenes/Stage";
+import Menu from "./scenes/Menu";
 
 const config = {
   title: "Stone Age Runner",
@@ -10,11 +11,11 @@ const config = {
   width: 640,
   height: 360,
   parent: "game-container",
-  scene: [Stage],
+  scene: [Menu, Stage],
   physics: {
     default: "arcade",
     arcade: {
-      debug: true,
+      debug: false,
       gravity: { y: 1000 },
     },
   },

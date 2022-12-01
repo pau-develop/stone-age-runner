@@ -73,18 +73,15 @@ class Stage extends Phaser.Scene {
     this.heroSounds.push(this.sound.add("spikes", { loop: false })); //5
     this.map.getSound(this.heroSounds[2]);
     this.music = this.sound.add("track", { loop: true });
-    // this.music.play();
+    this.music.play();
 
     this.ui = new Ui(this, this.game);
-    this.hero = new Hero(this, 64, 200, "hero", this.heroSounds);
+    this.hero = new Hero(this, -64, 200, "hero", this.heroSounds);
 
-    this.jump = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-    this.accelerate = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.RIGHT
+    this.jump = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.SPACE
     );
-    this.break = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.LEFT
-    );
+
     this.map.instantiateMap(this.hero, this.monkeyGroup, this);
     this.background = this.add.image(0, 0, "background");
     this.background.setOrigin(0, 0);
@@ -106,7 +103,6 @@ class Stage extends Phaser.Scene {
     this.meters = Math.round(this.cameras.main.scrollX / 64);
     this.ui.displayDistance(this.meters);
     this.ui.displayScore(this.hero.score);
-    this.ui.getFPS(this.game);
     this.ui.controlBar(this.hero.heroEnergy);
     this.hero.checkForCollision();
 
@@ -128,7 +124,7 @@ class Stage extends Phaser.Scene {
       this.hero.moveCharacter();
     } else if (!this.hero.isAlive) {
       if (!this.hero.justCrashed) {
-        this.ui.displayDeathMessage(this);
+        this.ui.displayDeathMessage(this, this.meters, this.hero.score);
         this.hero.body.velocity.y = 0;
         this.hero.justCrashed = true;
       }
@@ -204,7 +200,8 @@ class Stage extends Phaser.Scene {
           this.ui.die !== undefined
         ) {
           this.music.stop();
-          this.scene.restart();
+
+          this.scene.stop("Stage").start("Menu");
           this.hasRestarted = true;
         }
       });
